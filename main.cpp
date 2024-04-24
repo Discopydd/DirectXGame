@@ -66,10 +66,10 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	RegisterClass(&wc);
 
-	const int32_t kCljientWidth = 1280;
+	const int32_t kClientWidth = 1280;
 	const int32_t kClientHeight = 720;
 
-	RECT wrc = { 0,0,kCljientWidth,kClientHeight };
+	RECT wrc = { 0,0,kClientWidth,kClientHeight };
 
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
@@ -91,11 +91,15 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 #pragma endregion
 
+#pragma region DXGIFactoryの生成
+
 	IDXGIFactory7* dxgiFactory = nullptr;
 
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
+	#pragma endregion
 
+#pragma region GPUを決定する
 		//使用するアダプタ用の変数。初にnullptrを入れておく
 	IDXGIAdapter4* useAdapter = nullptr;
 
@@ -115,8 +119,9 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	}
     //適切なアダプタが見つからなかったので起動できない
 	assert(useAdapter != nullptr);
+	#pragma endregion
 
-
+#pragma region D3D12Deviceの生成
 	ID3D12Device* device = nullptr;
 	//機能レ7レとログ出力用の文字列
 	D3D_FEATURE_LEVEL featureLevels[] = {
@@ -139,6 +144,77 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 //デバイスの生成がうまくいかなかったので起動できない
 assert(device != nullptr);
 Log("CompLete create D3D12Device!!!\n");//初期化完了のログをだす
+#pragma endregion
+
+#pragma region ComandQueueを生成する
+ID3D12CommandQueue* commandQueue = nullptr;
+
+	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+
+	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
+
+	assert(SUCCEEDED(hr));
+	#pragma endregion
+
+#pragma region ComandListを生成する
+	ID3D12CommandAllocator* commandAllocator = nullptr;
+	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+	assert(SUCCEEDED(hr));
+
+	ID3D12GraphicsCommandList* commandList = nullptr;
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr,
+		IID_PPV_ARGS(&commandList));
+	assert(SUCCEEDED(hr));
+	#pragma endregion
+
+#pragma region SwapChainを生成する
+	IDXGISwapChain4* swapChain = nullptr;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	swapChainDesc.Width = kClientWidth;
+	swapChainDesc.Height = kClientHeight;
+	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	assert(SUCCEEDED(hr));
+#pragma endregion
+
+#pragma region DesciptorHeapを生成する
+	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	rtvDescriptorHeapDesc.NumDescriptors = 2;
+	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
+	assert(SUCCEEDED(hr));
+#pragma endregion
+
+#pragma region SwapChainからResourceを引っ張ってくる
+	ID3D12Resource* swapChainResources[2] = { nullptr };
+	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
+	assert(SUCCEEDED(hr));
+
+	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
+	assert(SUCCEEDED(hr));
+#pragma endregion
+
+#pragma region RTVを作る
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvStarHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	rtvHandles[0] = rtvStarHandle;
+	device->CreateRenderTargetView(swapChainResources[0], &rtvDesc, rtvHandles[0]);
+
+	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
+#pragma endregion
 
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
@@ -149,6 +225,27 @@ Log("CompLete create D3D12Device!!!\n");//初期化完了のログをだす
 		}
 		else {
 			//ゲーム処理
+
+		    //これから書き込むバックバッファのインデックスを取得
+			UINT backBufferlndex = swapChain->GetCurrentBackBufferIndex();
+	        //描画先のRTVを設定する
+			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferlndex], false, nullptr);
+    //指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };//青っぽい色。RGBAの順
+	commandList->ClearRenderTargetView(rtvHandles[backBufferlndex], clearColor, 0, nullptr);
+    //コマンドリストの内容を確定させる。
+	hr = commandList->Close();
+  assert(SUCCEEDED(hr));
+ //GPWこコマンドリストの実行を行わせる
+  ID3D12CommandList* commandLists[] = { commandList };
+  commandQueue->ExecuteCommandLists(1, commandLists);
+  //GPUとOSに画面の交換を行うよう通知する
+  swapChain->Present(1, 0);
+//次のフレーム用のコマンドリストを準備
+  hr = commandAllocator->Reset();
+  assert(SUCCEEDED(hr));
+  hr = commandList->Reset(commandAllocator, nullptr);
+  assert(SUCCEEDED(hr));
 		}
 	}
 	OutputDebugStringA("Hello,DirectX\n");
