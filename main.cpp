@@ -148,6 +148,32 @@ return shaderBlob;
 }
 #pragma endregion
 
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    D3D12_RESOURCE_DESC resourceDesc = {};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Width = sizeInBytes;
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+    ID3D12Resource* bufferResource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&bufferResource));
+    assert(SUCCEEDED(hr));
+
+    return bufferResource;
+}
+
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	
 #pragma region Windowの生成
@@ -389,8 +415,16 @@ assert(SUCCEEDED(hr));
 #pragma region RootSignature作成
 
 D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-
 descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
+D3D12_ROOT_PARAMETER rootParameters[1] = {};
+rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+rootParameters[0].Descriptor.ShaderRegister = 0; // レジスタ番号0にバインド
+descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
+descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ
+
 //シリアライズしてバイナリにする
 ID3DBlob* signatureBlob = nullptr;
 ID3DBlob* errorBlob = nullptr;
@@ -434,6 +468,16 @@ assert(vertexShaderBlob != nullptr);
 IDxcBlob* pixelShaderBlob = CompileShader(L"Object3D.PS.hlsl",
 L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 assert(pixelShaderBlob != nullptr);
+
+//ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
+//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
+ ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
+ //マテリアルにデータを書き込む
+    Vector4* materialData = nullptr;
+// 書き込むためのアドレスを取得
+    materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//今回は赤を書き込んでみる
+    *materialData = Vector4{1.0f, 0.0f, 0.0f, 1.0f};
 //PSOを生成する
 D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 graphicsPipelineStateDesc.pRootSignature = rootSignature;// RootSignature 
@@ -566,6 +610,8 @@ commandList->ResourceBarrier(1, &barrier);
 
         commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		  commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+
         commandList->DrawInstanced(3, 1, 0, 0);
 
 //画面に描く処理はすべて終わり、画面に映すので、状態を遷移
@@ -627,6 +673,7 @@ if (errorBlob) {
 rootSignature->Release(); 
 pixelShaderBlob->Release(); 
 vertexShaderBlob->Release();
+materialResource->Release();
 CloseWindow(hwnd); 
 #pragma endregion
 
