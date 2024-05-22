@@ -11,6 +11,13 @@
 #include"Struct.h"
 #include"MyMath.h"
 
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -18,7 +25,9 @@
 
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+        return true;
+    }
 	switch (msg) {
 
 	case WM_DESTROY:
@@ -144,6 +153,24 @@ shaderSource->Release();
 shaderResult->Release();
 // 実行用のバイナリを返却
 return shaderBlob;
+}
+#pragma endregion
+
+#pragma region DescriptorHeapの作成関数
+ID3D12DescriptorHeap* CreateDescriptorHeap(
+    ID3D12Device* device,
+    D3D12_DESCRIPTOR_HEAP_TYPE heapType,
+    UINT numDescriptors,
+    bool shaderVisible)
+{
+    ID3D12DescriptorHeap* descriptorHeap = nullptr;
+    D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
+    descriptorHeapDesc.Type = heapType;
+    descriptorHeapDesc.NumDescriptors = numDescriptors;
+    descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+    assert(SUCCEEDED(hr));
+    return descriptorHeap;
 }
 #pragma endregion
 
@@ -348,12 +375,9 @@ ID3D12CommandQueue* commandQueue = nullptr;
 #pragma endregion
 
 #pragma region DesciptorHeapを生成する
-	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
-	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	rtvDescriptorHeapDesc.NumDescriptors = 2;
-	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
-	assert(SUCCEEDED(hr));
+	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
 #pragma endregion
 
 #pragma region SwapChainからResourceを引っ張ってくる
@@ -555,6 +579,17 @@ transform.translate = { 0.0f, 0.0f, -0.5f };
 
 Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
 
+IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplDX12_Init(device,
+                        swapChainDesc.BufferCount,
+                        rtvDesc.Format,
+                        srvDescriptorHeap,
+                        srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+                        srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
 
@@ -604,7 +639,7 @@ commandList->ResourceBarrier(1, &barrier);
 
 		   commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
-		   transform.rotate.y += 0.03f;
+		   transform.rotate.y += 0.08f;
             Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
             Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -614,6 +649,18 @@ commandList->ResourceBarrier(1, &barrier);
 
         commandList->DrawInstanced(3, 1, 0, 0);
 
+		 ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
+            commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+			 ImGui_ImplDX12_NewFrame();
+            ImGui_ImplWin32_NewFrame();
+            ImGui::NewFrame();
+
+            ImGui::ShowDemoWindow();
+
+            ImGui::Render();
+
+			 ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 //画面に描く処理はすべて終わり、画面に映すので、状態を遷移
 //今回はRenderTargetからPresentにする
 barrier.Transition.StateBefore=D3D12_RESOURCE_STATE_RENDER_TARGET; barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -648,10 +695,16 @@ commandList->ResourceBarrier(1, &barrier);
 		}
 	}
 #pragma region 解放処理
+
+	ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
 		CloseHandle(fenceEvent); 
 	fence->Release();
 
-rtvDescriptorHeap->Release(); 
+ rtvDescriptorHeap->Release();
+    srvDescriptorHeap->Release();  
 swapChainResources[0]->Release(); 
 swapChainResources[1]->Release();
 swapChain->Release();
