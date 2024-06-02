@@ -21,3 +21,7 @@ struct VertexData
     Vector4 position;
     Vector2 texcoord;
 };
+struct TriangleData {
+    float color[4];
+    Transform transform;
+};

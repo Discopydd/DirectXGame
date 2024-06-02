@@ -8,10 +8,12 @@
 #include<cassert>
 #include<dxgidebug.h>
 #include<dxcapi.h>
+#include<vector>
 #include"Struct.h"
 #include"MyMath.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -85,6 +87,32 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath) {
     return mipImages;
 }
 
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    D3D12_RESOURCE_DESC resourceDesc = {};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Width = sizeInBytes;
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+    ID3D12Resource* bufferResource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&bufferResource));
+    assert(SUCCEEDED(hr));
+
+    return bufferResource;
+}
+
 #pragma region TextureResource関数
 ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata, D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE)
 {
@@ -97,11 +125,9 @@ resourceDesc.DepthOrArraySize=UINT16(metadata.arraySize);//奥行or配列Texture
 resourceDesc.Format = metadata.format; // TextureのFormat
 resourceDesc.SampleDesc.Count=1;//サンプリングカウント。1個定。
 resourceDesc.Dimension=D3D12_RESOURCE_DIMENSION( metadata.dimension);// Textureの次元数。普段使っているのは2次元
-//利用するHeapの設定。非常に特殊な運用。62_04exで一般的なケース版がある
-D3D12_HEAP_PROPERTIES heapProperties{};
-heapProperties.Type=D3D12_HEAP_TYPE_CUSTOM;//細かい設定を行う
-heapProperties. CPUPageProperty=D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;// WriteBackボリシーでCPUアクセス可能 
-heapProperties. MemoryPoolPreference=D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
+// 利用するHeapの設定
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT; // デフォルトHeap設定
 
     // 3. Resourceを生成する
     ID3D12Resource* textureResource = nullptr;
@@ -119,27 +145,29 @@ heapProperties. MemoryPoolPreference=D3D12_MEMORY_POOL_L0;//プロセッサの�
 #pragma endregion
 
 #pragma region UploadTextureData関数
-void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
+[[nodiscard]]
+ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-    // Meta情報を取得
-    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+    DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 
-    // 全MipMapについて
-    for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
-        // MipMapLevelを指定して各Imageを取得
-        const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+    uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
+    ID3D12Resource* intermediateResource = CreateBufferResource(device, intermediateSize);
+    UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 
-        // Textureに転送
-        HRESULT hr = texture->WriteToSubresource(
-            UINT(mipLevel),
-            nullptr,           // 全領域へコピー
-            img->pixels,       // データアドレス
-            UINT(img->rowPitch), // 行サイズ
-            UINT(img->slicePitch) // 枚サイズ
-        );
-        assert(SUCCEEDED(hr));
-    }
+    // Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
+    D3D12_RESOURCE_BARRIER barrier{};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = texture;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+    commandList->ResourceBarrier(1, &barrier);
+
+    return intermediateResource;
 }
+
 #pragma endregion
 
 #pragma region CompileShader関数
@@ -246,31 +274,43 @@ ID3D12DescriptorHeap* CreateDescriptorHeap(
 }
 #pragma endregion
 
-ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
-    D3D12_HEAP_PROPERTIES heapProperties = {};
-    heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+#pragma region DepthStencilTextureResource関数
+ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+    // Resourceの設定
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Width = width; // Textureの幅
+    resourceDesc.Height = height; // Textureの高さ
+    resourceDesc.MipLevels = 1; // mipmapの数
+    resourceDesc.DepthOrArraySize = 1; // 奥行き or 配列Textureの配列数
+    resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // DepthStencilとして利用可能なフォーマット
+    resourceDesc.SampleDesc.Count = 1; // サンプリングカウント。固定値
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // 2次元
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // DepthStencilとして使う通知
 
-    D3D12_RESOURCE_DESC resourceDesc = {};
-    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    resourceDesc.Width = sizeInBytes;
-    resourceDesc.Height = 1;
-    resourceDesc.DepthOrArraySize = 1;
-    resourceDesc.MipLevels = 1;
-    resourceDesc.SampleDesc.Count = 1;
-    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    // Heapの設定
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT; // VRAM上に作る
 
-    ID3D12Resource* bufferResource = nullptr;
+    // 深度値のクリア設定
+    D3D12_CLEAR_VALUE depthClearValue{};
+    depthClearValue.DepthStencil.Depth = 1.0f; // 1.0f（最大値）でクリア
+    depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // フォーマット。Resourceと合わせる
+
+    // Resourceの生成
+    ID3D12Resource* resource = nullptr;
     HRESULT hr = device->CreateCommittedResource(
         &heapProperties,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&bufferResource));
+        D3D12_HEAP_FLAG_NONE, // Heapの特殊な設定。特になし
+        &resourceDesc, // Resourceの設定
+        D3D12_RESOURCE_STATE_DEPTH_WRITE, // 深度値を書き込む状態にしておく
+        &depthClearValue, // Clear値設定
+        IID_PPV_ARGS(&resource) // 作成するResourceポインタへのポインタ
+    );
     assert(SUCCEEDED(hr));
 
-    return bufferResource;
+    return resource;
 }
+#pragma endregion
 
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
@@ -452,7 +492,16 @@ ID3D12CommandQueue* commandQueue = nullptr;
 #pragma region DesciptorHeapを生成する
 	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	 ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	// 配置 DSV
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+    device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
+   
 #pragma endregion
 
 #pragma region SwapChainからResourceを引っ張ってくる
@@ -598,8 +647,7 @@ assert(vertexShaderBlob != nullptr);
 IDxcBlob* pixelShaderBlob = CompileShader(L"Object3D.PS.hlsl",
 L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 assert(pixelShaderBlob != nullptr);
-
-//ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
+  
 //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
  ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
  //マテリアルにデータを書き込む
@@ -616,6 +664,13 @@ Matrix4x4* wvpData = nullptr;
 wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 *wvpData = MakeIdentity4x4(); // 単位行列を書きこんでおく
 
+// 配置 Depth Stencil State
+D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+depthStencilDesc.DepthEnable = true;
+depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+depthStencilDesc.StencilEnable = false; // 如果不使用模板缓冲区
+
 //PSOを生成する
 D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 graphicsPipelineStateDesc.pRootSignature = rootSignature;// RootSignature 
@@ -629,6 +684,9 @@ graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;// RasterizerState
 // 書き込むRTVの情報
 graphicsPipelineStateDesc.NumRenderTargets = 1;
 graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; 
+//
+graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; // 确保格式一致
 // 利用するトポロジ（形状）のタイプ。三角形
 graphicsPipelineStateDesc.PrimitiveTopologyType =
 D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -657,10 +715,10 @@ scissorRect.top = 0;
 scissorRect.bottom = kClientHeight;
 #pragma endregion
 
-    ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+    ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 //頂点リソースにデータを書き込む
 VertexData* vertexData = nullptr;
@@ -675,6 +733,15 @@ vertexData[1].texcoord = { 0.5f, 0.0f };
 // 右下
 vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
 vertexData[2].texcoord = { 1.0f, 1.0f };
+// 左下
+vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+vertexData[3].texcoord = { 0.0f, 1.0f };
+// 上
+vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+vertexData[4].texcoord = { 0.5f, 0.0f };
+// 右下
+vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+vertexData[5].texcoord = { 1.0f, 1.0f };
 
 Transform transform = {};
 transform.scale = { 1.0f, 1.0f, 1.0f };
@@ -682,6 +749,7 @@ transform.rotate = { 0.0f, 0.0f, 0.0f };
 transform.translate = { 0.0f, 0.0f, -0.5f };
 
 Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
+
 
 IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -698,27 +766,7 @@ IMGUI_CHECKVERSION();
 DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
 const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
-UploadTextureData(textureResource, mipImages);
-// 状態変換を追加
-D3D12_RESOURCE_BARRIER textureBarrier = {};
-textureBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-textureBarrier.Transition.pResource = textureResource;
-textureBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-textureBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-textureBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-commandList->ResourceBarrier(1, &textureBarrier);
-// コマンドリストを閉じて送信および実行して状態変換が確実に実行されるようにする
-hr = commandList->Close();
-assert(SUCCEEDED(hr));
-ID3D12CommandList* commandLists[] = { commandList };
-commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-commandQueue->Signal(fence, ++fenceValue);
-if (fence->GetCompletedValue() < fenceValue) {
-    fence->SetEventOnCompletion(fenceValue, fenceEvent);
-    WaitForSingleObject(fenceEvent, INFINITE);
-}
-commandAllocator->Reset();
-commandList->Reset(commandAllocator, nullptr);
+ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
 
 
 // metaDataを基にSRVの設定
@@ -754,7 +802,8 @@ static Vector3 scale = {1.0f, 1.0f, 1.0f};
 
 		    //これから書き込むバックバッファのインデックスを取得
 			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
+			 D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            
 #pragma region TransitionBarrierを張るコード
 			D3D12_RESOURCE_BARRIER barrier{};
 //今回のバリアはTransition
@@ -772,10 +821,11 @@ commandList->ResourceBarrier(1, &barrier);
 	#pragma endregion
 
 	        //描画先のRTVを設定する
-			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false,  &dsvHandle);
     //指定した色で画面全体をクリアする
 	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };//青っぽい色。RGBAの順
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	 commandList->RSSetViewports(1, &viewport);
         commandList->RSSetScissorRects(1, &scissorRect);
@@ -810,7 +860,7 @@ commandList->ResourceBarrier(1, &barrier);
         // 设置描述符表
         commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-        commandList->DrawInstanced(3, 1, 0, 0);
+        commandList->DrawInstanced(6, 1, 0, 0);
 
 	
 
