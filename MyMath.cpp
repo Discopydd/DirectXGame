@@ -182,6 +182,7 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip
 Matrix4x4 MakeOrthographicMatrix(float left, float right, float top, float bottom, float nearClip, float farClip) {
     Matrix4x4 result;
 
+
     result.m[0][0] = 2.0f / (right - left);
     result.m[0][1] = 0.0f;
     result.m[0][2] = 0.0f;
@@ -231,9 +232,10 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
     return result;
 }
 Matrix4x4 MakeIdentity4x4() {
-    Matrix4x4 identity = {};
-    for (int i = 0; i < 4; ++i) {
-        identity.m[i][i] = 1.0f;
-    }
-    return identity;
+   Matrix4x4 matrix = {};
+    matrix.m[0][0] = 1.0f;
+    matrix.m[1][1] = 1.0f;
+    matrix.m[2][2] = 1.0f;
+    matrix.m[3][3] = 1.0f;
+    return matrix;
 }
