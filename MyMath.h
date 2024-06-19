@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include<cmath>
+#define M_PI 3.14159265358979323846
 #include"Struct.h"
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
@@ -15,3 +16,5 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 Matrix4x4 Inverse(const Matrix4x4& m);
 
 Matrix4x4 MakeIdentity4x4();
+
+void Sphere(VertexData* vertexData);

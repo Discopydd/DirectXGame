@@ -1,5 +1,6 @@
 #include<Windows.h>
 #include<cstdint>
+#include <sstream>
 #include<string>
 #include<format>
 
@@ -636,7 +637,7 @@ blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 //RasiterzerStateの設定
 D3D12_RASTERIZER_DESC rasterizerDesc{};
 //裏面（時計回り）を表示しない
-rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 //三角形の中を塗りつぶす
 rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 // Shaderをコンパイルする
@@ -724,37 +725,85 @@ scissorRect.top = 0;
 scissorRect.bottom = kClientHeight;
 #pragma endregion
 
-#pragma region 三角形
-    ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+#pragma region 球
+
+const uint32_t kSubdivision = 16; // 分割数
+const uint32_t Pinnacle = kSubdivision * kSubdivision * 6;
+    ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * Pinnacle);
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * Pinnacle;
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 //頂点リソースにデータを書き込む
 VertexData* vertexData = nullptr;
 // 書き込むためのアドレスを取得
 vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
-// 左下
-vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-vertexData[0].texcoord = { 0.0f, 1.0f };
-// 上
-vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
-vertexData[1].texcoord = { 0.5f, 0.0f };
-// 右下
-vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
-vertexData[2].texcoord = { 1.0f, 1.0f };
-// 左下
-vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-vertexData[3].texcoord = { 0.0f, 1.0f };
-// 上
-vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-vertexData[4].texcoord = { 0.5f, 0.0f };
-// 右下
-vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-vertexData[5].texcoord = { 1.0f, 1.0f };
+
+    const float kLonEvery = 2 *(float)M_PI / (float)kSubdivision; // 经度分割1つの角度
+    const float kLatEvery =(float) M_PI / (float)kSubdivision; // 纬度分割1つの角度
+
+    // 緯度の方向に分割 -π/2 ~ π/2
+    for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+        float lat = -(float)M_PI / 2.0f + kLatEvery * latIndex; // 現在の緯度
+
+        // 経度の方向に分割 0 ~ 2π
+        for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+            uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+            float lon = lonIndex * kLonEvery; // 現在の経度
+
+        // 頂点a
+        vertexData[start].position.x = cos(lat) * cos(lon);
+        vertexData[start].position.y = sin(lat);
+        vertexData[start].position.z = cos(lat) * sin(lon);
+        vertexData[start].position.w = 1.0f;
+        vertexData[start].texcoord.x = (float)lonIndex / (float)kSubdivision;
+        vertexData[start].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
+
+        // 頂点b (lat + kLatEvery, lon)
+        vertexData[start + 1].position.x = cos(lat + kLatEvery) * cos(lon);
+        vertexData[start + 1].position.y = sin(lat + kLatEvery);
+        vertexData[start + 1].position.z = cos(lat + kLatEvery) * sin(lon);
+        vertexData[start + 1].position.w = 1.0f;
+        vertexData[start + 1].texcoord.x = (float)lonIndex / (float)kSubdivision;
+        vertexData[start + 1].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
+
+        // 頂点c (lat, lon + kLonEvery)
+        vertexData[start + 2].position.x = cos(lat) * cos(lon + kLonEvery);
+        vertexData[start + 2].position.y = sin(lat);
+        vertexData[start + 2].position.z = cos(lat) * sin(lon + kLonEvery);
+        vertexData[start + 2].position.w = 1.0f;
+        vertexData[start + 2].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
+        vertexData[start + 2].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
+
+         // 頂点d (lat + kLatEvery, lon)
+        vertexData[start + 3].position.x = cos(lat + kLatEvery) * cos(lon);
+        vertexData[start + 3].position.y = sin(lat + kLatEvery);
+        vertexData[start + 3].position.z = cos(lat + kLatEvery) * sin(lon);
+        vertexData[start + 3].position.w = 1.0f;
+        vertexData[start + 3].texcoord.x = (float)lonIndex / (float)kSubdivision;
+        vertexData[start + 3].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
+
+         // 頂点e (lat, lon + kLonEvery)
+        vertexData[start + 4].position.x = cos(lat) * cos(lon + kLonEvery);
+        vertexData[start + 4].position.y = sin(lat);
+        vertexData[start + 4].position.z = cos(lat) * sin(lon + kLonEvery);
+        vertexData[start + 4].position.w = 1.0f;
+        vertexData[start + 4].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
+        vertexData[start + 4].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
+
+        // 頂点f (lat + kLatEvery, lon + kLonEvery)
+        vertexData[start + 5].position.x = cos(lat + kLatEvery) * cos(lon + kLonEvery);
+        vertexData[start + 5].position.y = sin(lat + kLatEvery);
+        vertexData[start + 5].position.z = cos(lat + kLatEvery) * sin(lon + kLonEvery);
+        vertexData[start + 5].position.w = 1.0f;
+        vertexData[start + 5].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
+        vertexData[start + 5].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
+        
+        }
+    }
 
 Transform transform = {};
-transform.scale = { 1.0f, 1.0f, 1.0f };
+transform.scale = { 0.0f,0.0f, 0.0f };
 transform.rotate = { 0.0f, 0.0f, 0.0f };
 transform.translate = { 0.0f, 0.0f, 0.0f };
 
@@ -835,7 +884,7 @@ ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipIma
 	static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f}; 
 	static Vector3 translate = {0.0f, 0.0f, 0.0f};
 static Vector3 rotate = {0.0f, 0.0f, 0.0f};
-static Vector3 scale = {1.0f, 1.0f, 1.0f};
+static Vector3 scale = {0.5f, 0.5f, 0.5f};
 static Vector3 translateSprite = {0.0f, 0.0f, 0.0f};
 
 	MSG msg{};
@@ -905,7 +954,7 @@ while (msg.message != WM_QUIT) {
 
         // テクスチャのデスクリプタテーブルを設定する
         commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-        commandList->DrawInstanced(6, 1, 0, 0);
+        commandList->DrawInstanced(Pinnacle, 1, 0, 0);
 
         // 2D Spriteを描画する
         commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // VBVを設定

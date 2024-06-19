@@ -231,6 +231,7 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
     return result;
 }
+
 Matrix4x4 MakeIdentity4x4() {
    Matrix4x4 matrix = {};
     matrix.m[0][0] = 1.0f;
@@ -238,4 +239,9 @@ Matrix4x4 MakeIdentity4x4() {
     matrix.m[2][2] = 1.0f;
     matrix.m[3][3] = 1.0f;
     return matrix;
+}
+
+void Sphere(VertexData* vertexData)
+{
+     
 }
