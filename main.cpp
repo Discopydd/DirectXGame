@@ -313,6 +313,21 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 }
 #pragma endregion
 
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr += (descriptorSize * index);
+    return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr += (descriptorSize * index);
+    return handleGPU;
+}
+
+
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -419,6 +434,11 @@ assert(device != nullptr);
 Log("CompLete create D3D12Device!!!\n");//初期化完了のログをだす
 #pragma endregion
 
+// 初始化DescriptorSize
+const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
 #ifdef _DEBUG
 
 ID3D12InfoQueue* infoQueue = nullptr;
@@ -519,14 +539,14 @@ ID3D12CommandQueue* commandQueue = nullptr;
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStarHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
-	rtvHandles[0] = rtvStarHandle;
+	rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 0);
+
 	device->CreateRenderTargetView(swapChainResources[0], &rtvDesc, rtvHandles[0]);
 
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles[1] = GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 1);
 
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 #pragma endregion
@@ -860,11 +880,16 @@ IMGUI_CHECKVERSION();
                         srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 // Textureを読んで転送する
-DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
 const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
 ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
 
+// 2枚Textureを読んで転送する
+DirectX::ScratchImage mipImages2 = LoadTexture("Resources/monsterBall.png");
+const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+ID3D12Resource* textureResource2 = CreateTextureResource(device, metadata2);
+ID3D12Resource* intermediateResource2 = UploadTextureData(textureResource2, mipImages2, device, commandList);
 
 // metaDataを基にSRVの設定
  D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -873,19 +898,31 @@ ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipIma
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     srvDesc.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
 	//SRVを作成する DescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	//先頭はImGuiが使っているのでその次を使う
-	textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV); 
-	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+   D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
+   D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
 	//SRWの生成
     device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
+    srvDesc2.Format = metadata2.format;
+    srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+    srvDesc2.Texture2D.MipLevels = static_cast<UINT>(metadata2.mipLevels);
+
+    //SRVを作成する DescriptorHeapの場所を決める
+   D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+   D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+	//SRWの生成
+    device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
 
 	static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f}; 
 	static Vector3 translate = {0.0f, 0.0f, 0.0f};
 static Vector3 rotate = {0.0f, 0.0f, 0.0f};
 static Vector3 scale = {0.5f, 0.5f, 0.5f};
 static Vector3 translateSprite = {0.0f, 0.0f, 0.0f};
+
+bool useMonsterBall = true;
 
 	MSG msg{};
 while (msg.message != WM_QUIT) {
@@ -897,6 +934,7 @@ while (msg.message != WM_QUIT) {
           Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
           // ワールド、ビュー、プロジェクションマトリックスを計算して設定する
         transform.rotate = rotate;
+        rotate.y += 0.01f;
         transform.scale = scale;
         transform.translate = translate;
         Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -953,12 +991,13 @@ while (msg.message != WM_QUIT) {
         commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
         // テクスチャのデスクリプタテーブルを設定する
-        commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+         commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
         commandList->DrawInstanced(Pinnacle, 1, 0, 0);
 
         // 2D Spriteを描画する
         commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // VBVを設定
         commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+         commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
         commandList->DrawInstanced(6, 1, 0, 0);
 
         // ImGuiの新しいフレームを開始する
@@ -973,6 +1012,7 @@ while (msg.message != WM_QUIT) {
         ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
         ImGui::DragFloat3("Scale", &scale.x, 0.1f);
         ImGui::DragFloat3("TranslateSprite", &translateSprite.x, 1.0f);
+        ImGui::Checkbox("useMonsterBall", &useMonsterBall);
         ImGui::End();
 
         // ImGuiの描画データをレンダリングする
