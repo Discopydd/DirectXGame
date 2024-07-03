@@ -29,8 +29,22 @@ struct VertexData
 {
     Vector4 position;
     Vector2 texcoord;
+    Vector3 normal;
 };
 struct TriangleData {
     float color[4];
     Transform transform;
+};
+struct Material {
+    Vector4 color;
+    int32_t enableLighting;
+};
+struct TransformationMatrix {
+    Matrix4x4 WVP;
+    Matrix4x4 world;
+};
+struct DirectionalLight {
+    Vector4 color;
+    Vector3 direction;
+    float intensity;
 };

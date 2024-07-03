@@ -638,7 +638,7 @@ assert(SUCCEEDED(hr));
 
 #pragma region InputLayoutの設定から
 //InputLayout
-D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 inputElementDescs[0].SemanticName = "POSITION";
 inputElementDescs[0].SemanticIndex = 0;
 inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -647,6 +647,10 @@ inputElementDescs[1].SemanticName = "TEXCOORD";
 inputElementDescs[1].SemanticIndex = 0;
 inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+inputElementDescs[2].SemanticName = "NORMAL";
+inputElementDescs[2].SemanticIndex = 0;
+inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 inputLayoutDesc.pInputElementDescs = inputElementDescs;
 inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -778,7 +782,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start].position.w = 1.0f;
         vertexData[start].texcoord.x = (float)lonIndex / (float)kSubdivision;
         vertexData[start].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
-
+        vertexData[start].normal.x = vertexData[start].position.x;
+         vertexData[start].normal.y = vertexData[start].position.y;
+         vertexData[start].normal.z = vertexData[start].position.z;
         // 頂点b (lat + kLatEvery, lon)
         vertexData[start + 1].position.x = cos(lat + kLatEvery) * cos(lon);
         vertexData[start + 1].position.y = sin(lat + kLatEvery);
@@ -786,7 +792,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start + 1].position.w = 1.0f;
         vertexData[start + 1].texcoord.x = (float)lonIndex / (float)kSubdivision;
         vertexData[start + 1].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
-
+          vertexData[start+1].normal.x = vertexData[start+1].position.x;
+         vertexData[start+1].normal.y = vertexData[start+1].position.y;
+         vertexData[start+1].normal.z = vertexData[start+1].position.z;
         // 頂点c (lat, lon + kLonEvery)
         vertexData[start + 2].position.x = cos(lat) * cos(lon + kLonEvery);
         vertexData[start + 2].position.y = sin(lat);
@@ -794,7 +802,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start + 2].position.w = 1.0f;
         vertexData[start + 2].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
         vertexData[start + 2].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
-
+          vertexData[start+2].normal.x = vertexData[start+2].position.x;
+         vertexData[start+2].normal.y = vertexData[start+2].position.y;
+         vertexData[start+2].normal.z = vertexData[start+2].position.z;
          // 頂点d (lat + kLatEvery, lon)
         vertexData[start + 3].position.x = cos(lat + kLatEvery) * cos(lon);
         vertexData[start + 3].position.y = sin(lat + kLatEvery);
@@ -802,7 +812,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start + 3].position.w = 1.0f;
         vertexData[start + 3].texcoord.x = (float)lonIndex / (float)kSubdivision;
         vertexData[start + 3].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
-
+          vertexData[start+3].normal.x = vertexData[start+3].position.x;
+         vertexData[start+3].normal.y = vertexData[start+3].position.y;
+         vertexData[start+3].normal.z = vertexData[start+3].position.z;
          // 頂点e (lat, lon + kLonEvery)
         vertexData[start + 4].position.x = cos(lat) * cos(lon + kLonEvery);
         vertexData[start + 4].position.y = sin(lat);
@@ -810,7 +822,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start + 4].position.w = 1.0f;
         vertexData[start + 4].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
         vertexData[start + 4].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
-
+          vertexData[start+4].normal.x = vertexData[start+4].position.x;
+         vertexData[start+4].normal.y = vertexData[start+4].position.y;
+         vertexData[start+4].normal.z = vertexData[start+4].position.z;
         // 頂点f (lat + kLatEvery, lon + kLonEvery)
         vertexData[start + 5].position.x = cos(lat + kLatEvery) * cos(lon + kLonEvery);
         vertexData[start + 5].position.y = sin(lat + kLatEvery);
@@ -818,7 +832,9 @@ vertexResource-> Map(0,nullptr, reinterpret_cast<void**>(&vertexData));
         vertexData[start + 5].position.w = 1.0f;
         vertexData[start + 5].texcoord.x = (float)(lonIndex + 1) / (float)kSubdivision;
         vertexData[start + 5].texcoord.y = 1.0f - (float)(latIndex + 1) / (float)kSubdivision;
-        
+          vertexData[start+5].normal.x = vertexData[start+5].position.x;
+         vertexData[start+5].normal.y = vertexData[start+5].position.y;
+         vertexData[start+5].normal.z = vertexData[start+5].position.z;
         }
     }
 
@@ -843,21 +859,28 @@ vertexResourceSprite-> Map(0,nullptr, reinterpret_cast<void**>(&vertexDataSprite
 // 左下
 vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
 vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
+vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
 // 左上
 vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
 vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
+vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
 // 右下
 vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
 vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
+vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
 // 左下
 vertexDataSprite[3].position = { 0.0f, 0.0f, 0.0f, 1.0f };
 vertexDataSprite[3].texcoord = { 0.0f, 0.0f };
+vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
 // 右上
 vertexDataSprite[4].position = { 640.0f, 0.0f, 0.0f, 1.0f };
 vertexDataSprite[4].texcoord = { 1.0f, 0.0f };
+vertexDataSprite[4].normal = { 0.0f,0.0f,-1.0f };
 // 右下
 vertexDataSprite[5].position = { 640.0f,360.0f, 0.0f, 1.0f };
 vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
+vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
+
 
 // CPUで動かす用のTransformを作る
 Transform transformSprite = {};
