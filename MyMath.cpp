@@ -241,7 +241,15 @@ Matrix4x4 MakeIdentity4x4() {
     return matrix;
 }
 
-void Sphere(VertexData* vertexData)
-{
-     
+
+float Length(const Vector3& vec) {
+    return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
+Vector3 Normalize(const Vector3& vec) {
+    float length = Length(vec);
+    if (length != 0) {
+        return { vec.x / length, vec.y / length, vec.z / length };
+    }
+    return { 0, 0, 0 };
 }
