@@ -3,7 +3,13 @@
 #include<cmath>
 #define M_PI 3.14159265358979323846
 #include"Struct.h"
+Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+
+Matrix4x4 MakeRotateZMatrix(float radian);
+
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 

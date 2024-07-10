@@ -680,6 +680,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // WVP用のリソースを作る。 Matrix4x41つ分のサイズを用意する
     ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(TransformationMatrix));
 
+     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
+    ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Material));
+    //マテリアルにデータを書き込む
+    Material* materialData = nullptr;
+    // 書き込むためのアドレスを取得
+    materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+    *materialData = Material{ {1.0f, 1.0f, 1.0f, 1.0f},{1}
+    };
+
+    materialData->enableLighting = false;
+
+    materialData->uvTransfotm = MakeIdentity4x4();
+
     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
     ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
     //マテリアルにデータを書き込む
@@ -687,10 +701,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 書き込むためのアドレスを取得
     materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
 
-    *materialDataSprite = Material{ {1.0f, 1.0f, 1.0f, 1.0f},{1}
+    *materialDataSprite = Material{ {1.0f, 1.0f, 1.0f, 1.0f},{0}
     };
 
     materialDataSprite->enableLighting = false;
+
+    materialDataSprite->uvTransfotm = MakeIdentity4x4();
 
     // データを書き込む
     TransformationMatrix* wvpData = nullptr;
@@ -706,6 +722,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     directionalLightData->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightData->intensity = 1.0f;
+
+    ID3D12Resource* directionalLightResourceSprite = CreateBufferResource(device, sizeof(DirectionalLight));
+
+    DirectionalLight* directionalLightDataSprite = nullptr;
+    directionalLightResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSprite));
+    directionalLightDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
+    directionalLightDataSprite->intensity = 1.0f;
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
     ID3D12Resource* transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -938,7 +962,8 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
     //SRWの生成
     device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
 
-    static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    static ImVec4 ballColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    static ImVec4 spriteColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     static Vector3 translate = { 0.0f, 0.0f, 0.0f };
     static Vector3 rotate = { 0.0f, 0.0f, 0.0f };
     static Vector3 scale = { 0.5f, 0.5f, 0.5f };
@@ -948,7 +973,13 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
     bool useMonsterBall = true;
 
     bool enableLighting = true;
+    bool enableLightingSprite = false;
 
+    Transform uvTransformSprite{
+        {1.0f,1.0f,1.0f},
+        {0.0f,0.0f,0.0f},
+        {0.0f,0.0f,0.0f}
+    };
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -976,7 +1007,11 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
             Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, float(kClientWidth), 0.0f, float(kClientHeight), 0.0f, 100.0f);
             Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
             transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-
+            //uvTransformMatrix用の行列
+            Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+            uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+            uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+            materialDataSprite->uvTransfotm = uvTransformMatrix;
             // これから書き込むバックバッファのインデックスを取得
             UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
             D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -1006,29 +1041,38 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
             commandList->SetGraphicsRootSignature(rootSignature);
             commandList->SetPipelineState(graphicsPipelineState);
 
-            // 3D三角形を描画する
+            // 3D球を描画する
             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             commandList->IASetIndexBuffer(&indexBufferView);
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-            *materialDataSprite = Material{ {color[0], color[1], color[2], color[3]},{1}
-            };
-            materialDataSprite->enableLighting = enableLighting;
-            commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
+            materialData->color.x = ballColor.x;
+            materialData->color.y = ballColor.y;
+            materialData->color.z = ballColor.z;
+            materialData->color.w = ballColor.w;
+            materialData->enableLighting = enableLighting;
+            commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
             commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-            // テクスチャのデスクリプタテーブルを設定する
+             // テクスチャのデスクリプタテーブルを設定する
             commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
             commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
 
             // 2D Spriteを描画する
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // VBVを設定
             commandList->IASetIndexBuffer( &indexBufferViewSprite); // IBVを設定
+            materialDataSprite->color.x = spriteColor.x;
+            materialDataSprite->color.y = spriteColor.y;
+            materialDataSprite->color.z = spriteColor.z;
+            materialDataSprite->color.w = spriteColor.w;
+            materialDataSprite->enableLighting = enableLightingSprite;
+            commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
             commandList->DrawIndexedInstanced(6, 1, 0, 0,0);
 
@@ -1039,17 +1083,24 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
 
             // ImGuiウィンドウの設定
             ImGui::Begin("Window");
-            ImGui::ColorEdit4("Triangle Color", color);
+            ImGui::ColorEdit4("Color", &ballColor.x);
             ImGui::DragFloat3("Translate", &translate.x, 0.1f);
             ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
             ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+             ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+
+            ImGui::ColorEdit4("Sprite Color", &spriteColor.x);
             ImGui::DragFloat3("TranslateSprite", &translateSprite.x, 1.0f);
-            ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+
              ImGui::Checkbox("enableLighting", &enableLighting);
             ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
             ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
             directionalLightData->direction = Normalize(directionalLightData->direction);
+
             ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+            ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+            ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+            ImGui::SliderAngle("UVRoate", &uvTransformSprite.rotate.z);
             ImGui::End();
 
             // ImGuiの描画データをレンダリングする
@@ -1123,6 +1174,7 @@ pixelShaderBlob->Release();
 vertexShaderBlob->Release();
 textureResource->Release();
 materialResourceSprite->Release();
+materialResource->Release();
 CloseWindow(hwnd); 
 CoUninitialize();
 #pragma endregion
