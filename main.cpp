@@ -5,6 +5,7 @@
 #include<string>
 #include<format>
 
+
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<cassert>
@@ -356,7 +357,7 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
             Vector4 position;
             lineStream >> position.x >> position.y >> position.z;
             position.w = 1.0f;
-            position.z *= -1.0f;
+            position.x *= -1.0f;
             positions.push_back(position);
         }
         else if (identifier == "vt") {
@@ -783,7 +784,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialData->enableLighting = false;
 
-    materialData->uvTransfotm = MakeIdentity4x4();
+    materialData->uvTransform = MakeIdentity4x4();
 
     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
     ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -797,7 +798,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialDataSprite->enableLighting = false;
 
-    materialDataSprite->uvTransfotm = MakeIdentity4x4();
+    materialDataSprite->uvTransform = MakeIdentity4x4();
 
 
 
@@ -812,7 +813,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialDataModel->enableLighting = false;
 
-    materialDataModel->uvTransfotm = MakeIdentity4x4();
+    materialDataModel->uvTransform = MakeIdentity4x4();
     // データを書き込む
     TransformationMatrix* wvpData = nullptr;
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
@@ -1038,7 +1039,7 @@ for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
 
 #pragma region モデル
 // モデル読み込み
-ModelData modelData = LoadObjFile("Resources", "multiMesh.obj");
+ModelData modelData = LoadObjFile("Resources", "axis.obj");
 
 // 頂点リソースを作成
 ID3D12Resource* vertexResourceModel = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
@@ -1093,27 +1094,38 @@ Transform transformModel = {};
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     srvDesc.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
-    //SRVを作成する DescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
-    D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
-    //SRWの生成
-    device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
-
-
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
-    srvDesc2.Format = metadata2.format;
+     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
+    srvDesc2.Format = metadata.format;
     srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    srvDesc2.Texture2D.MipLevels = static_cast<UINT>(metadata2.mipLevels);
-
+    srvDesc2.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
+     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc3 = {};
+    srvDesc3.Format = metadata.format;
+    srvDesc3.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc3.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+    srvDesc3.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
     //SRVを作成する DescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-    D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-    //SRWの生成
-    device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU1, textureSrvHandleCPU2, textureSrvHandleCPU3;
+D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU1, textureSrvHandleGPU2, textureSrvHandleGPU3;
+   textureSrvHandleCPU1 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
+   textureSrvHandleGPU1 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
+       //SRWの生成
+    device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU1);
+
+    textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
+
+// 初始化第三个纹理
+textureSrvHandleCPU3 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
+textureSrvHandleGPU3 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
+device->CreateShaderResourceView(textureResource3, &srvDesc3, textureSrvHandleCPU3);
+
+
 
     static ImVec4 ballColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     static ImVec4 spriteColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+      static ImVec4 modelColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     static Vector3 translate = { 0.0f, 0.0f, 0.0f };
     static Vector3 rotate = { 0.0f, 0.0f, 0.0f };
     static Vector3 scale = { 0.5f, 0.5f, 0.5f };
@@ -1138,6 +1150,14 @@ Transform transformModel = {};
         {0.0f,0.0f,0.0f},
         {0.0f,0.0f,0.0f}
     };
+
+    enum class DrawMode {
+    Sphere,
+    Sprite,
+    Model
+};
+
+DrawMode currentDrawMode = DrawMode::Sphere;
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -1173,7 +1193,7 @@ Transform transformModel = {};
             Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
-            materialDataSprite->uvTransfotm = uvTransformMatrix;
+            materialDataSprite->uvTransform = uvTransformMatrix;
            //Model
             transformModel.rotate = modelRotate;
             transformModel.scale = modelScale;
@@ -1213,50 +1233,71 @@ Transform transformModel = {};
             commandList->SetGraphicsRootSignature(rootSignature);
             commandList->SetPipelineState(graphicsPipelineState);
 
-            // 3D球を描画する
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-            commandList->IASetIndexBuffer(&indexBufferView);
-            commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+ // 
+ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
+commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-            materialData->color.x = ballColor.x;
-            materialData->color.y = ballColor.y;
-            materialData->color.z = ballColor.z;
-            materialData->color.w = ballColor.w;
-            materialData->enableLighting = enableLighting;
-            commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+// 3D球
+if (currentDrawMode == DrawMode::Sphere) {
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    commandList->IASetIndexBuffer(&indexBufferView);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-            ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
-            commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+    materialData->color.x = ballColor.x;
+    materialData->color.y = ballColor.y;
+    materialData->color.z = ballColor.z;
+    materialData->color.w = ballColor.w;
+    materialData->enableLighting = enableLighting;
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
-             // テクスチャのデスクリプタテーブルを設定する
-            commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-            commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
+    commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);
+    commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
+}
 
-            // 2D Spriteを描画する
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // VBVを設定
-            commandList->IASetIndexBuffer( &indexBufferViewSprite); // IBVを設定
-            materialDataSprite->color.x = spriteColor.x;
-            materialDataSprite->color.y = spriteColor.y;
-            materialDataSprite->color.z = spriteColor.z;
-            materialDataSprite->color.w = spriteColor.w;
-            materialDataSprite->enableLighting = enableLightingSprite;
-            commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceSprite->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-            commandList->DrawIndexedInstanced(6, 1, 0, 0,0);
+// 
+commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-            //modelを描画
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
-            commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+// 2DSprite
+if (currentDrawMode == DrawMode::Sprite) {
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+    commandList->IASetIndexBuffer(&indexBufferViewSprite);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-            //
-            commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel->GetGPUVirtualAddress());
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+    materialDataSprite->color.x = spriteColor.x;
+    materialDataSprite->color.y = spriteColor.y;
+    materialDataSprite->color.z = spriteColor.z;
+    materialDataSprite->color.w = spriteColor.w;
+    materialDataSprite->enableLighting = enableLightingSprite;
+    commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceSprite->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU1);
+    commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+
+//
+commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+//model
+if (currentDrawMode == DrawMode::Model) {
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    materialDataModel->color.x = modelColor.x;
+    materialDataModel->color.y = modelColor.y;
+    materialDataModel->color.z = modelColor.z;
+    materialDataModel->color.w = modelColor.w;
+    materialDataModel->enableLighting = enableLightingModel;
+    commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
+    commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+}
+
+
 
             // ImGuiの新しいフレームを開始する
             ImGui_ImplDX12_NewFrame();
@@ -1264,38 +1305,56 @@ Transform transformModel = {};
             ImGui::NewFrame();
 
             // ImGuiウィンドウの設定
-            ImGui::Begin("Window");
-            
-            ImGui::Text("Camera");
-            ImGui::DragFloat3("Camera Position", &cameraTransform.translate.x, 0.1f);
-            ImGui::DragFloat3("Camera Rotation", &cameraTransform.rotate.x, 0.1f);
+         ImGui::Begin("Window");
 
-            ImGui::Text("Ball");
-            ImGui::ColorEdit4("Color", &ballColor.x);
-            ImGui::DragFloat3("Translate", &translate.x, 0.1f);
-            ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
-            ImGui::DragFloat3("Scale", &scale.x, 0.1f);
-             ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+ImGui::Text("Camera");
+ImGui::DragFloat3("Camera Position", &cameraTransform.translate.x, 0.1f);
+ImGui::DragFloat3("Camera Rotation", &cameraTransform.rotate.x, 0.1f);
 
-             ImGui::Text("Sprite");
-            ImGui::ColorEdit4("Sprite Color", &spriteColor.x);
-            ImGui::DragFloat3("TranslateSprite", &translateSprite.x, 1.0f);
+ImGui::Text("Draw Mode");
+if (ImGui::Button("Sphere")) {
+    currentDrawMode = DrawMode::Sphere;
+}
+if (ImGui::Button("Sprite")) {
+    currentDrawMode = DrawMode::Sprite;
+}
+if (ImGui::Button("Model")) {
+    currentDrawMode = DrawMode::Model;
+}
 
-            ImGui::Text("Model");
-            ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
-            ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
-            ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
+if (currentDrawMode == DrawMode::Sphere) {
+    ImGui::Text("Ball");
+    ImGui::ColorEdit4("Color", &ballColor.x);
+    ImGui::DragFloat3("Translate", &translate.x, 0.1f);
+    ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
+    ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+    ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+    ImGui::Checkbox("enableLighting", &enableLighting);
+    ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
+    ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
+    directionalLightData->direction = Normalize(directionalLightData->direction);
+    ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+}
 
-             ImGui::Checkbox("enableLighting", &enableLighting);
-            ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
-            ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
-            directionalLightData->direction = Normalize(directionalLightData->direction);
+if (currentDrawMode == DrawMode::Sprite) {
+    ImGui::Text("Sprite");
+    ImGui::ColorEdit4("Sprite Color", &spriteColor.x);
+    ImGui::DragFloat3("TranslateSprite", &translateSprite.x, 1.0f);
+    ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+    ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+    ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
+}
 
-            ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
-            ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-            ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-            ImGui::SliderAngle("UVRoate", &uvTransformSprite.rotate.z);
-            ImGui::End();
+if (currentDrawMode == DrawMode::Model) {
+    ImGui::Text("Model");
+    ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
+    ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
+    ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
+}
+
+ImGui::End();
+
+
 
             // ImGuiの描画データをレンダリングする
             ImGui::Render();

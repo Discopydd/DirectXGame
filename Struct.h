@@ -44,7 +44,7 @@ struct Material {
     Vector4 color;
     int32_t enableLighting;
     float padding[3];
-    Matrix4x4 uvTransfotm;
+    Matrix4x4 uvTransform;
 };
 struct TransformationMatrix {
     Matrix4x4 WVP;
