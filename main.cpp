@@ -1044,7 +1044,7 @@ device->CreateShaderResourceView(textureResource3.Get(), &srvDesc3, textureSrvHa
 
     bool enableLighting = true;
     bool enableLightingSprite = false;
-    bool enableLightingModel = false;
+    bool enableLightingModel = true;
 
     Transform uvTransformSprite{
         {1.0f,1.0f,1.0f},
@@ -1256,6 +1256,11 @@ if (currentDrawMode == DrawMode::Model) {
     ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
     ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
     ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
+     ImGui::Checkbox("enableLighting", &enableLightingModel);
+    ImGui::ColorEdit4("Light Color", &directionalLightDataModel->color.x);
+    ImGui::DragFloat3("Light Direction", &directionalLightDataModel->direction.x, 0.1f);
+     directionalLightDataModel->direction = Normalize(directionalLightDataModel->direction);
+    ImGui::DragFloat("Light Intensity", &directionalLightDataModel->intensity, 0.1f);
 }
 
 ImGui::End();
