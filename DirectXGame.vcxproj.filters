@@ -81,6 +81,9 @@
     <ClInclude Include="ResourceObject.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DebugReporter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

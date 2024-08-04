@@ -15,6 +15,7 @@
 #include<vector>
 #include"Struct.h"
 #include"MyMath.h"
+#include"DebugReporter.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -367,22 +368,10 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
 }
 
 
-    struct D3DResourceLeakChecker {
-        ~D3DResourceLeakChecker()
-        {
-            Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-
-    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-        debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-    }
-        }
-    };
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-    D3DResourceLeakChecker leakChecker;
+    DebugReporter debugReporter;
 
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
@@ -423,13 +412,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-#ifdef _DEBUG
+
     Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
         debugController->EnableDebugLayer();
         debugController->SetEnableGPUBasedValidation(TRUE);
     }
-#endif // DEBUG
+
 
 
 #pragma region DXGIFactoryの生成
@@ -478,7 +467,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-#ifdef _DEBUG
+
 
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
     if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
@@ -495,7 +484,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         filter.DenyList.pSeverityList = severities;
         infoQueue->PushStorageFilter(&filter);
     }
-#endif
+
 
 
 #pragma region ComandQueueを生成する
