@@ -1062,13 +1062,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     {0.0f,0.0f,0.0f}
     };
 
-    enum class DrawMode {
-        Sphere,
-        Sprite,
-        Model
-    };
+    bool showSphere = true;
+bool showSprite = false;
+bool showModel = false;
 
-    DrawMode currentDrawMode = DrawMode::Sphere;
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -1149,7 +1146,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
             // 3D球
-            if (currentDrawMode == DrawMode::Sphere) {
+                     if (showSphere) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
                 commandList->IASetIndexBuffer(&indexBufferView);
                 commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1171,7 +1168,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
             // 2DSprite
-            if (currentDrawMode == DrawMode::Sprite) {
+            if (showSprite) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
                 commandList->IASetIndexBuffer(&indexBufferViewSprite);
                 commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1192,7 +1189,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
             //model
-            if (currentDrawMode == DrawMode::Model) {
+            if (showModel) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
                 commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -1224,16 +1221,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             ImGui::Text("Draw Mode");
             if (ImGui::Button("Sphere")) {
-                currentDrawMode = DrawMode::Sphere;
+                showSphere = !showSphere;
             }
             if (ImGui::Button("Sprite")) {
-                currentDrawMode = DrawMode::Sprite;
+                showSprite = !showSprite;
             }
             if (ImGui::Button("Model")) {
-                currentDrawMode = DrawMode::Model;
+                showModel = !showModel;
             }
 
-            if (currentDrawMode == DrawMode::Sphere) {
+            if (showSphere) {
                 ImGui::Text("Ball");
                 ImGui::ColorEdit4("Color", &ballColor.x);
                 ImGui::DragFloat3("Translate", &translate.x, 0.1f);
@@ -1247,7 +1244,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
             }
 
-            if (currentDrawMode == DrawMode::Sprite) {
+            if (showSprite) {
                 ImGui::Text("Sprite");
                 ImGui::ColorEdit4("Sprite Color", &spriteColor.x);
                 ImGui::DragFloat3("TranslateSprite", &translateSprite.x, 1.0f);
@@ -1256,7 +1253,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
             }
 
-            if (currentDrawMode == DrawMode::Model) {
+            if (showModel) {
                 ImGui::Text("Model");
                 ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
                 ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
