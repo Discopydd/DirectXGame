@@ -16,6 +16,7 @@
 #include"Struct.h"
 #include"MyMath.h"
 #include"DebugReporter.h"
+#include"Input.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -969,8 +970,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region モデル
     // モデル読み込み
-    ModelData modelData = LoadObjFile("Resources", "axis.obj");
-
+    ModelData modelData = LoadObjFile("Resources", "plane.obj");
+    
     // 頂点リソースを作成
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceModel = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
 
@@ -1085,6 +1086,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 bool showSprite = false;
 bool showModel = false;
 
+
+Input* input = nullptr;
+
+input = new Input();
+input->Initialize(wc.hInstance,hwnd);
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -1237,7 +1243,7 @@ bool showModel = false;
             ImGui::Text("Camera");
             ImGui::DragFloat3("Camera Position", &cameraTransform.translate.x, 0.1f);
             ImGui::DragFloat3("Camera Rotation", &cameraTransform.rotate.x, 0.1f);
-
+            ImGui::DragFloat3("Camera Translate", &cameraTransform.translate.x, 0.1f);
             ImGui::Text("Draw Mode");
             if (ImGui::Button("Sphere")) {
                 showSphere = !showSphere;
@@ -1274,6 +1280,7 @@ bool showModel = false;
 
             if (showModel) {
                 ImGui::Text("Model");
+                ImGui::ColorEdit4("Color", &modelColor.x);
                 ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
                 ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
                 ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
@@ -1332,7 +1339,7 @@ bool showModel = false;
 
     CloseHandle(fenceEvent);
 
-   
+    delete input;
     DestroyWindow(hwnd);
 
     CoUninitialize();
