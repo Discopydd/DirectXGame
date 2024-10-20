@@ -1019,8 +1019,7 @@ modelData.material.textureFilePath = "./Resources/uvChecker.png";
 
 #pragma region
     const uint32_t kNumInstance = 10;  // 实例的数量
-
-// 为实例化的 TransformationMatrix 创建资源
+// 
 Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = CreateBufferResource(
     device, sizeof(TransformationMatrix) * kNumInstance);
 
@@ -1030,7 +1029,7 @@ instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 
 // 初始化 TransformationMatrix 数据
 for (uint32_t index = 0; index < kNumInstance; ++index) {
-    instancingData[index].WVP = MakeIdentity4x4();  // 设置为单位矩阵（可以根据需求修改）
+    instancingData[index].WVP = MakeIdentity4x4();  
     instancingData[index].World = MakeIdentity4x4();
 }
 #pragma endregion
@@ -1142,10 +1141,10 @@ device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, i
     Transform transforms[kNumInstance];
 for (uint32_t index = 0; index < kNumInstance; ++index) {
     // 
-    transforms[index].scale = {1.0f, 1.0f, 1.0f};
+    transforms[index].scale = {0.5f, 0.5f, 0.5f};
     
     // 
-    transforms[index].rotate = {0.0f, 0.0f, 0.0f};
+    transforms[index].rotate = {0.0f, 3.0f, 0.0f};
     
     //
     transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
@@ -1214,11 +1213,9 @@ input->Initialize(wc.hInstance,hwnd);
     Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[index].scale, 
                                              transforms[index].rotate, 
                                              transforms[index].translate);
-    Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
-    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-
-    instancingData[index].WVP = worldViewProjectionMatrix;
-    instancingData[index].World = worldMatrix;
+   Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+				instancingData[index].WVP = worldViewProjectionMatrix;
+				instancingData[index].World = worldMatrix;
 }
 
             // これから書き込むバックバッファのインデックスを取得
@@ -1301,12 +1298,13 @@ input->Initialize(wc.hInstance,hwnd);
             if (showModel) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
                 commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-               
+                 materialDataModel->color.x = modelColor.x;
+                materialDataModel->color.y = modelColor.y;
+                materialDataModel->color.z = modelColor.z;
+                materialDataModel->color.w = modelColor.w;
                 materialDataModel->enableLighting = enableLightingModel;
                 commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceModel->GetGPUVirtualAddress());
-               /* commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());*/
+               commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
                commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(4, instancingSrvHandleGPU);
