@@ -94,12 +94,21 @@
     <None Include="Resources\shaders\Object3d.hlsli">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="Resources\shaders\Particle.hlsli">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
       <Filter>资源文件</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\Object3d.VS.hlsl">
+      <Filter>资源文件</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Particle.PS.hlsl">
+      <Filter>资源文件</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\Particle.VS.hlsl">
       <Filter>资源文件</Filter>
     </FxCompile>
   </ItemGroup>
