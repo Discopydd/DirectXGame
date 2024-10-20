@@ -1153,7 +1153,7 @@ for (uint32_t index = 0; index < kNumInstance; ++index) {
 
     bool showSphere = false;
 bool showSprite = false;
-bool showModel = false;
+bool showModel = true;
 
 
 Input* input = nullptr;
