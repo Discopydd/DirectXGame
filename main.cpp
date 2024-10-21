@@ -1165,7 +1165,7 @@ bool showModel = true;
 Input* input = nullptr;
 
 input = new Input();
-input->Initialize(winApp->GetHInstance(), winApp->GetHwnd());
+input->Initialize(winApp);
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -1428,9 +1428,7 @@ input->Initialize(winApp->GetHInstance(), winApp->GetHwnd());
     CloseHandle(fenceEvent);
 
     delete input;
-    DestroyWindow(hwnd);
-
-    CoUninitialize();
-
+    winApp->Finalize();
+    delete winApp;
 	return 0;
 }

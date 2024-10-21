@@ -62,3 +62,9 @@ ShowWindow(hwnd, SW_SHOW);
 void WinApp::Update()
 {
 }
+
+void WinApp::Finalize()
+{
+    CloseWindow(hwnd);
+    CoUninitialize();
+}

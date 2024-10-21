@@ -3,11 +3,12 @@
 #include <Windows.h>
 #include <wrl.h>
 #include<dinput.h>
+#include"WinApp.h"
 class Input {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 public: 
-	void Initialize(HINSTANCE hInstance,HWND hwnd);
+	void Initialize(WinApp* winApp);
 
 
 	void Update();
@@ -20,4 +21,5 @@ private:
 	ComPtr<IDirectInput8> directInput;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
+	WinApp* winApp_ = nullptr;
 };
