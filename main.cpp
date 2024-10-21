@@ -1,5 +1,4 @@
 #include<Windows.h>
-#include<cstdint>
 #include <sstream>
 #include<fstream>
 #include<string>
@@ -22,17 +21,13 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+
+WinApp* winApp = nullptr;
 
 enum BlendMode {
     kBlendModeNone,
@@ -43,21 +38,6 @@ enum BlendMode {
     kBlendModeScreen,
     kCountOfBlendMode
 };
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-        return true;
-    }
-	switch (msg) {
-
-	case WM_DESTROY:
-
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
 
 void Log(const std::string & message){
 		OutputDebugStringA(message.c_str());
@@ -378,53 +358,20 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     return handleGPU;
 }
 
-WinApp* winApp = nullptr;
 
-winApp = new WinApp();
-winApp->Initialize();
 
-delete winApp;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-
+    winApp = new WinApp();
+    
     DebugReporter debugReporter;
 
-    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 
 
 #pragma region Windowの生成
 
-    WNDCLASS wc{};
-
-    wc.lpfnWndProc = WindowProc;
-    wc.lpszClassName = L"CG2WindowClass";
-    wc.hInstance = GetModuleHandle(nullptr);
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    RegisterClass(&wc);
-
-    const int32_t kClientWidth = 1280;
-    const int32_t kClientHeight = 720;
-
-    RECT wrc = { 0,0,kClientWidth,kClientHeight };
-
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-    HWND hwnd = CreateWindow(
-        wc.lpszClassName,
-        L"CG2",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        wrc.right - wrc.left,
-        wrc.bottom - wrc.top,
-        nullptr,
-        nullptr,
-        wc.hInstance,
-        nullptr
-    );
-
-    ShowWindow(hwnd, SW_SHOW);
+    winApp->Initialize();
 
 #pragma endregion
 
@@ -1043,7 +990,7 @@ for (uint32_t index = 0; index < kNumInstance; ++index) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplWin32_Init(winApp->GetHwnd());
     ImGui_ImplDX12_Init(device.Get(),
         swapChainDesc.BufferCount,
         rtvDesc.Format,
@@ -1167,11 +1114,10 @@ Input* input = nullptr;
 input = new Input();
 input->Initialize(winApp);
 
-    MSG msg{};
-    while (msg.message != WM_QUIT) {
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
+    while(true)
+        {
+            if(winApp->ProcessMessage()){
+                break;
         }
         else {
            if (input->TriggerKey(DIK_0)) {

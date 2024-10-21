@@ -1,7 +1,7 @@
 #include"WinApp.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_win32.cpp"
 
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -27,20 +27,21 @@ void WinApp::Initialize()
 {
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 
-WNDCLASS wc{};
-wc.lpfnWndProc = WindowProc;
-wc.lpszClassName = L"CG2WindowClass";
-wc.hInstance = GetModuleHandle(nullptr);
-wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    assert(SUCCEEDED(hr));
 
-RegisterClass(&wc);
+    // 设置窗口类
+    wc.lpfnWndProc = WindowProc;
+    wc.lpszClassName = L"CG2WindowClass";
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
+    RegisterClass(&wc);
 
 
 RECT wrc = { 0, 0, kClientWidth, kClientHeight };
 AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-HWND hwnd = CreateWindow(
+hwnd = CreateWindow(
     wc.lpszClassName,
     L"CG2",
     WS_OVERLAPPEDWINDOW,
@@ -53,18 +54,30 @@ HWND hwnd = CreateWindow(
     wc.hInstance,
     nullptr
 );
-
 ShowWindow(hwnd, SW_SHOW);
 
 
-}
-
-void WinApp::Update()
-{
 }
 
 void WinApp::Finalize()
 {
     CloseWindow(hwnd);
     CoUninitialize();
+}
+
+bool WinApp::ProcessMessage()
+{
+    MSG msg = {};
+
+    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    if (msg.message == WM_QUIT)
+    {
+        return true;
+    }
+    return false;
 }
