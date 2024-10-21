@@ -17,6 +17,7 @@
 #include"MyMath.h"
 #include"DebugReporter.h"
 #include"Input.h"
+#include"WinApp.h"
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -377,7 +378,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     return handleGPU;
 }
 
+WinApp* winApp = nullptr;
 
+winApp = new WinApp();
+winApp->Initialize();
+
+delete winApp;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
