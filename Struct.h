@@ -6,6 +6,17 @@ struct Vector4 {
 };
 struct Vector3 {
     float x, y, z;
+
+     Vector3 operator*(float scalar) const {
+        return {x * scalar, y * scalar, z * scalar};
+    }
+
+    Vector3& operator+=(const Vector3& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
 };
 struct Vector2 {
     float x, y;
@@ -62,4 +73,18 @@ struct MateriaData
 struct ModelData {
     std::vector<VertexData>vertices;
     MateriaData material;
+};
+struct Particle
+{
+    Transform transform;
+    Vector3 velocity;
+    Vector4 color;
+    float lifeTime;
+    float currentTime;
+};
+struct ParticleForGPU
+{
+   Matrix4x4 WVP;
+    Matrix4x4 World;
+    Vector4 color;
 };
