@@ -17,6 +17,7 @@
 #include"DebugReporter.h"
 #include"Input.h"
 #include"WinApp.h"
+#include <numbers>
 
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
@@ -911,7 +912,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     transform.rotate = { 0.0f, 0.0f, 0.0f };
     transform.translate = { 0.0f, 0.0f, 0.0f };
 
-    Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
+    /*Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };*/
+        Transform cameraTransform = {
+    {1.0f, 1.0f, 1.0f}, 
+    {std::numbers::pi_v<float> / 3.0f, std::numbers::pi_v<float>, 0.0f},
+    {0.0f, 23.0f, 10.0f} 
+};
 #pragma endregion
 
 #pragma region Sprite
@@ -1123,6 +1129,7 @@ device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, i
     {0.0f,0.0f,0.0f},
     {0.0f,0.0f,0.0f}
     };
+
     Particle particles[kNumMaxInstance];
     const float kDeltaTime = 1.0f / 60.0f;
 for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -1136,7 +1143,7 @@ for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
     bool showSphere = false;
 bool showSprite = false;
 bool showModel = true;
-
+bool useBillboard = true;
 
 Input* input = nullptr;
 
@@ -1190,6 +1197,7 @@ while (true)
         modelWvpData->WVP = worldViewProjectionMatrixModel;
         modelWvpData->World = worldMatrixModel;
 
+       
 
       			uint32_t numInstance = 0;
 			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -1201,16 +1209,27 @@ while (true)
 					particles[index].transform.scale, 
 					particles[index].transform.rotate, 
 					particles[index].transform.translate);
+                if (useBillboard) {
+                 Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+        Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+        Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, viewMatrix);
+        billboardMatrix.m[3][0] = 0.0f;
+billboardMatrix.m[3][1] = 0.0f;
+billboardMatrix.m[3][2] = 0.0f;
+        worldMatrix = Multiply(billboardMatrix, worldMatrix);
+                }
 				Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-
-				particles[index].transform.translate += particles[index].velocity * kDeltaTime;
-				particles[index].currentTime += kDeltaTime;
-				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
-				instancingData[numInstance].WVP = worldViewProjectionMatrix;
-				instancingData[numInstance].World = worldMatrix;
-				instancingData[numInstance].color = particles[index].color;
-				instancingData[numInstance].color.w = alpha;
-				++numInstance;
+                if (update) {
+                    particles[index].transform.translate += particles[index].velocity * kDeltaTime;
+                    particles[index].currentTime += kDeltaTime;
+                }
+                    float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
+                    instancingData[numInstance].WVP = worldViewProjectionMatrix;
+                    instancingData[numInstance].World = worldMatrix;
+                    instancingData[numInstance].color = particles[index].color;
+                    instancingData[numInstance].color.w = alpha;
+                    ++numInstance;
+                
 			}
 
 
@@ -1370,6 +1389,7 @@ while (true)
             directionalLightDataModel->direction = Normalize(directionalLightDataModel->direction);
             ImGui::DragFloat("Light Intensity", &directionalLightDataModel->intensity, 0.1f);
             ImGui::Checkbox("update", &update);
+            ImGui::Checkbox("Use Billboard", &useBillboard);
         }
 
         ImGui::End();
