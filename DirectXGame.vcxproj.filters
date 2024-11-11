@@ -48,6 +48,9 @@
     <ClCompile Include="WinApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXCommon.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyMath.h">
@@ -90,6 +93,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="WinApp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXCommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
