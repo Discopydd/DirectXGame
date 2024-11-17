@@ -27,3 +27,5 @@ Matrix4x4 MakeIdentity4x4();
 float Length(const Vector3& vec);
 
 Vector3 Normalize(const Vector3& vec);
+
+Vector3 Add(const Vector3& v1, const Vector3& v2);
