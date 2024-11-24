@@ -29,3 +29,8 @@ float Length(const Vector3& vec);
 Vector3 Normalize(const Vector3& vec);
 
 Vector3 Add(const Vector3& v1, const Vector3& v2);
+
+Vector3 Subtract(const Vector3& v1, const Vector3& v2);
+
+//ParticleがFieldの範囲内かどうか判定
+bool IsCollision(const AABB& aabb, const Vector3& point);

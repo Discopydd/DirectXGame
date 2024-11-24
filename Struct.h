@@ -95,3 +95,13 @@ struct Emitter {
 	float frequency;//発生頻度
 	float frequencyTime;//頻度用時刻
 };
+
+
+struct AABB {
+	Vector3 min;//最小点
+	Vector3 max;//最大点
+};
+struct AccelerationField {
+	Vector3 acceleration;//加速度
+	AABB area;//範囲
+};
