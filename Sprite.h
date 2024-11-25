@@ -41,7 +41,7 @@ public:
 	//描画
 	void Draw();
 private:
-	SpriteCommon* spriteBase = nullptr;
+	SpriteCommon* spriteCommon = nullptr;
 	//頂点データ作成
 	void VertexDataCreate();
 	//index作成

@@ -362,8 +362,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     // 初始化 TransformationMatrix 数据
     for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-        instancingData[index].WVP = MakeIdentity4x4();
-        instancingData[index].World = MakeIdentity4x4();
+        instancingData[index].WVP = Math::MakeIdentity4x4();
+        instancingData[index].World = Math::MakeIdentity4x4();
         instancingData[index].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     }
 #pragma endregion
@@ -550,14 +550,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
             // ゲーム処理
-            Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+            Matrix4x4 cameraMatrix = Math::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 
             // ワールド、ビュー、プロジェクションマトリックスを計算して設定する
             transform.rotate = rotate;
             rotate.y += 0.01f;
             transform.scale = scale;
             transform.translate = translate;
-            Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+            Matrix4x4 worldMatrix = Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.0f);
             Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
