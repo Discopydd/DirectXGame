@@ -13,6 +13,8 @@ namespace Math {
 
 	Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
+	Matrix4x4 MakeRotateYMatrix(float radian);
+
 	Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2);
 
 	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotation, const Vector3& translation);
