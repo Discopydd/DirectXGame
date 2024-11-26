@@ -19,6 +19,7 @@
 #include "D3DResourceLeakChecker.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
+#include "TextureManager.h"
 
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -48,49 +49,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     spriteCommon->Initialize(dxCommon);
 
 
-    Sprite* sprite = new Sprite();
-    sprite->Initialize(spriteCommon);
 
-    //Sprite初期化
+
+   TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->LoadTexture("Resources/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("Resources/monsterBall.png");
+
+	//Sprite初期化
 	std::vector<Sprite*>sprites;
-	for (uint32_t i = 0; i < 5; ++i) {
+	for (uint32_t i = 0; i < 2; ++i) {
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(spriteCommon);
-		sprite->SetPosition({ 100.0f * i,0.0f });
-		sprite->SetSize({ 50.0f,50.0f });
+		sprite->Initialize(spriteCommon, "Resources/uvChecker.png");
+		sprite->SetPosition({ 100.0f * i,50.0f });
+		sprite->SetSize({ 100.0f,100.0f });
 		sprites.push_back(sprite);
 	}
+	sprites[0]->SetTexture("Resources/uvChecker.png");
+	sprites[1]->SettextureSize({ 200.0f,200.0f });
+	sprites[1]->SetTexture("Resources/monsterBall.png");
 
-
-    // Textureを読んで転送する
-    DirectX::ScratchImage mipImages = dxCommon->LoadTexture("Resources/uvChecker.png");
-    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-    Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
-    Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon->UploadTextureData(textureResource, mipImages);
-
-
-
-    // metaDataを基にSRVの設定
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = metadata.format;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    srvDesc.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
-
-
-    //SRVを作成する DescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetSRVCPUDescriptorHandle(1);
-    //D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon->GetSRVGPUDescriptorHandle(1);
-
-
-    //textureSrvHandleCPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    //textureSrvHandleGPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    // SRVの設定
-    dxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-
-    Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	Transform uvTransformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 #pragma endregion 
 
 
@@ -113,17 +90,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             //ImGui::Begin("Window");
 
           
-        for (size_t i = 0; i < sprites.size(); ++i) {
+      for (size_t i = 0; i < sprites.size(); ++i) {
 			Sprite* sprite = sprites[i];
-
-			//回転テスト
-			float rotaion = sprite->GetRotation();
-			rotaion += 0.01f;
-			sprite->SetRotation(rotaion);
-
-			//Spriteの更新
 			sprite->Update();
 		}
+
 		dxCommon->Begin();
 
 		//Spriteの描画準備

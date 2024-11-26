@@ -90,6 +90,12 @@ public: // メンバ関数
 
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() const { return srvDescriptorHeap.Get(); }
 
+
+	void CommandOved();
+
+	// 最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
+
 private: // メンバ変数
 	// ウィンドウズアプリケーション管理
 	WinApp* winApp_ = nullptr;
@@ -140,6 +146,7 @@ private: // メンバ変数
 	D3D12_RESOURCE_BARRIER barrier{};
 
 	std::chrono::steady_clock::time_point reference_;
+
 
 private: // メンバ関数
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>

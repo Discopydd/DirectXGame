@@ -3,9 +3,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
-#include"WinApp.h"
-#include <wrl/client.h>
-#include <d3d12.h>
+#include "externals/DirectXTex/d3dx12.h"
 
 //頂点データ
 struct VertexData {
@@ -26,20 +24,25 @@ struct TransformationMatrix {
 	Matrix4x4 World;
 };
 struct Transform {
-    Vector3 scale;
-    Vector3 rotate;
-    Vector3 translate;
-};
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
+	};
+
 class SpriteCommon;
 class Sprite
 {
 public:
 	//初期化
-	void Initialize(SpriteCommon*spriteCommon);
+	void Initialize(SpriteCommon*spriteCommon,std::string textureFilePath);
     //更新
 	void Update();
 	//描画
 	void Draw();
+	//テクスチャ変更
+	void SetTexture(std::string textureFilePath);
+
+	///getter///
 	//位置
 	const Vector2& GetPosition()const { return position; }
 	//回転
@@ -48,6 +51,16 @@ public:
 	const Vector4& GetColor()const { return materialData->color; }
 	//サイズ
 	const Vector2& GetSize()const { return size; }
+	//アンカーポイント
+	const Vector2& GetAnchorPoint()const { return anchorPoint; }
+	//テクスチャ左上座標
+	const Vector2& GettextureLeftTop()const { return textureLeftTop; }
+	//テクスチャ切り出しサイズ
+	const Vector2& GettextureSize()const { return textureSize; }
+	//左右フリップ
+	const bool& GetisFlipX()const { return isFlipX_; }
+	//上下フリップ
+	const bool& GetisFlipY()const { return isFlipY_; }
 
 	///setter///
 	//位置
@@ -58,6 +71,16 @@ public:
 	void SetColor(const Vector4& color) { materialData->color = color; }
 	//サイズ
 	void SetSize(const Vector2& size) { this->size = size; }
+	//アンカーポイント
+	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	//テクスチャ左上座標
+	void SettextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop = textureLeftTop; }
+	//テクスチャ切り出しサイズ
+	void SettextureSize(const Vector2& textureSize) { this->textureSize = textureSize; }
+	//左右フリップ
+	void SetisFlipX(bool isFlipX) { this->isFlipX_ = isFlipX; }
+	//上下フリップ
+	void SetisFlipY(bool isFlipY) { this->isFlipY_ = isFlipY; }
 private:
 	SpriteCommon* spriteCommon = nullptr;
 	//頂点データ作成
@@ -68,6 +91,8 @@ private:
 	void MaterialCreate();
 	//座標変換行列データ作成
 	void TransformationCreate();
+	//テクスチャサイズをイメージに合わせる
+	void AdjustTextureSize();
 	//バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
@@ -83,11 +108,22 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-
 	//Sprite個々の座標
 	Vector2 position = { 0.0f,0.0f };
-	//Sprite個々の回転角
-	float rotation = 0.0f;
 	//サイズ
 	Vector2 size = { 640.0f,360.0f };
+	//アンカーポイント
+	Vector2 anchorPoint = { 0.0f,0.0f };
+	//テクスチャ左上座標
+	Vector2 textureLeftTop = { 0.0f,0.0f };
+	//テクスチャ切り出しサイズ
+	Vector2 textureSize = { 100.0f,100.0f };
+    //Sprite個々の回転角
+	float rotation = 0.0f;
+	//テクスチャ番号
+	uint32_t textureIndex = 0;
+	//左右フリップ
+	bool isFlipX_ = false;
+	//上下フリップ
+	bool isFlipY_ = false;
 };
