@@ -223,13 +223,6 @@ void DirectXCommon::RendertargetviewInitialize() {
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	// 2つ目
 	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
-	/*
-		for (uint32_t i = 0; i < 2; ++i) {
-		//まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定せてあげる必要がある
-		rtvHandles[i].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * i;
-		device->CreateRenderTargetView(swapChainResources[i].Get(), &rtvDesc, rtvHandles[i]);
-	}
-	*/
 }
 //深度ステンシルビューの初期化
 void DirectXCommon::DepthstencilviewInitialize() {

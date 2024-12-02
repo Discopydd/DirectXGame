@@ -152,6 +152,9 @@
     <ClInclude Include="math\Transform.h">
       <Filter>头文件\math</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

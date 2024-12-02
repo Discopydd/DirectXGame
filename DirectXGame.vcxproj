@@ -179,6 +179,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="D3DResourceLeakChecker.h" />
     <ClInclude Include="DebugReporter.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />

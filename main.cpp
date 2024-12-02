@@ -19,6 +19,8 @@
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "ModelData.h"
+#include"MaterialData.h"
+#include"DirectionalLight.h"
 
 MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
 {
@@ -157,6 +159,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     sprite->Initialize(spriteCommon);
 
     ModelData modelData = LoadObjFile("Resources", "plane.obj");
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>DirectionalLightResource = dxCommon->CreateBufferResource(sizeof(DirectionalLight));
+	//データを書き込む
+	DirectionalLight* directionalLightData = nullptr;
+	//書き込むためのアドレスと取得
+	DirectionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	//デフォルト値はとりあえず以下のようにしておく
+	directionalLightData->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightData->direction = { 0.0f,-1.0f,0.0f };
+	directionalLightData->intensity = 1.0f;
 
     DirectX::ScratchImage mipImages2 = DirectXCommon::LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
