@@ -98,6 +98,33 @@ namespace Math {
         return result;
     }
 
+    Matrix4x4 Math::MakeRotateXMatrix(float radian) {
+        Matrix4x4 result;
+        float c = float(cos(radian));
+        float s = float(sin(radian));
+
+        result.m[0][0] = 1.0f;
+        result.m[0][1] = 0.0f;
+        result.m[0][2] = 0.0f;
+        result.m[0][3] = 0.0f;
+
+        result.m[1][0] = 0.0f;
+        result.m[1][1] = c;
+        result.m[1][2] = s;
+        result.m[1][3] = 0.0f;
+
+        result.m[2][0] = 0.0f;
+        result.m[2][1] = -s;
+        result.m[2][2] = c;
+        result.m[2][3] = 0.0f;
+
+        result.m[3][0] = 0.0f;
+        result.m[3][1] = 0.0f;
+        result.m[3][2] = 0.0f;
+        result.m[3][3] = 1.0f;
+
+        return result;
+    }
     Matrix4x4 Math::Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
         Matrix4x4 result = {};
         for (int i = 0; i < 4; ++i) {
@@ -110,41 +137,16 @@ namespace Math {
         return result;
     }
 
-    Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Vector3& rotation, const Vector3& translation) {
-        // Scale
-        Matrix4x4 Scale = { 0 };
-        Scale.m[0][0] = scale.x;
-        Scale.m[1][1] = scale.y;
-        Scale.m[2][2] = scale.z;
-        Scale.m[3][3] = 1;
-        // Rotation
-        Matrix4x4 RotationZ = { 0 };
-        RotationZ.m[0][0] = cosf(rotation.z);
-        RotationZ.m[0][1] = sinf(rotation.z);
-        RotationZ.m[1][0] = -sinf(rotation.z);
-        RotationZ.m[1][1] = cosf(rotation.z);
-        RotationZ.m[2][2] = RotationZ.m[3][3] = 1;
-        Matrix4x4 RotationX = { 0 };
-        RotationX.m[1][1] = cosf(rotation.x);
-        RotationX.m[1][2] = sinf(rotation.x);
-        RotationX.m[2][1] = -sinf(rotation.x);
-        RotationX.m[2][2] = cosf(rotation.x);
-        RotationX.m[0][0] = RotationX.m[3][3] = 1;
-        Matrix4x4 RotationY = { 0 };
-        RotationY.m[0][0] = cosf(rotation.y);
-        RotationY.m[2][0] = sinf(rotation.y);
-        RotationY.m[0][2] = -sinf(rotation.y);
-        RotationY.m[2][2] = cosf(rotation.y);
-        RotationY.m[1][1] = RotationY.m[3][3] = 1;
-        Matrix4x4 Rotation = Multiply(RotationX, Multiply(RotationY, RotationZ));
-        // Translation
-        Matrix4x4 Translation = { 0 };
-        Translation.m[0][0] = Translation.m[1][1] = Translation.m[2][2] = Translation.m[3][3] = 1;
-        Translation.m[3][0] = translation.x;
-        Translation.m[3][1] = translation.y;
-        Translation.m[3][2] = translation.z;
+    Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+        Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+        Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+        Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+        Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+        Matrix4x4 rotateMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix)); // 回転の順序を修正
+        Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+        Matrix4x4 affineMatrix = Multiply(Multiply(scaleMatrix, rotateMatrix), translateMatrix);
 
-        return Multiply(Scale, Multiply(Rotation, Translation));
+        return affineMatrix;
     }
 
     Matrix4x4 Math::Inverse(const Matrix4x4& m) {
@@ -249,32 +251,24 @@ namespace Math {
     }
 
     Matrix4x4 Math::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
-        Matrix4x4 result = {};
-
-        float tanHalfFovY = tanf(fovY * 0.5f);
-        float cot = 1.0f / tanHalfFovY;
-
-        result.m[0][0] = cot / aspectRatio;
-        result.m[0][1] = 0.0f;
-        result.m[0][2] = 0.0f;
-        result.m[0][3] = 0.0f;
-
-        result.m[1][0] = 0.0f;
-        result.m[1][1] = cot;
-        result.m[1][2] = 0.0f;
-        result.m[1][3] = 0.0f;
-
-        result.m[2][0] = 0.0f;
-        result.m[2][1] = 0.0f;
-        result.m[2][2] = farClip / (farClip - nearClip);
-        result.m[2][3] = 1.0f;
-
-        result.m[3][0] = 0.0f;
-        result.m[3][1] = 0.0f;
-        result.m[3][2] = -(nearClip * farClip) / (farClip - nearClip);
-        result.m[3][3] = 0.0f;
-
-        return result;
+       	Matrix4x4 perspectiveMatrix;
+		perspectiveMatrix.m[0][0] = 1.0f / float((aspectRatio * tan(fovY / 2.0f)));
+		perspectiveMatrix.m[0][1] = 0;
+		perspectiveMatrix.m[0][2] = 0;
+		perspectiveMatrix.m[0][3] = 0;
+		perspectiveMatrix.m[1][0] = 0;
+		perspectiveMatrix.m[1][1] = 1.0f / float(tan(fovY / 2.0f));
+		perspectiveMatrix.m[1][2] = 0;
+		perspectiveMatrix.m[1][3] = 0;
+		perspectiveMatrix.m[2][0] = 0;
+		perspectiveMatrix.m[2][1] = 0;
+		perspectiveMatrix.m[2][2] = farClip / (farClip - nearClip);
+		perspectiveMatrix.m[2][3] = 1;
+		perspectiveMatrix.m[3][0] = 0;
+		perspectiveMatrix.m[3][1] = 0;
+		perspectiveMatrix.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+		perspectiveMatrix.m[3][3] = 0;
+		return perspectiveMatrix;
     }
 
     Matrix4x4 Math::MakeOrthographicMatrix(float left, float right, float top, float bottom, float nearClip, float farClip) {
@@ -331,12 +325,13 @@ namespace Math {
     }
 
     Matrix4x4 Math::MakeIdentity4x4() {
-        Matrix4x4 matrix = {};
-        matrix.m[0][0] = 1.0f;
-        matrix.m[1][1] = 1.0f;
-        matrix.m[2][2] = 1.0f;
-        matrix.m[3][3] = 1.0f;
-        return matrix;
+       Matrix4x4 result;
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				result.m[i][j] = (i == j) ? 1.0f : 0.0f;
+			}
+		}
+		return result;
     }
 
 

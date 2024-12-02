@@ -13,6 +13,8 @@ public:
 
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
 private:
+
+	HRESULT hr;
 	//ルートシグネチャの作成
 	void RootSignatureInitialize();
 
