@@ -202,14 +202,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightData->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightData->intensity = 1.0f;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceSprite = dxCommon->CreateBufferResource(sizeof(DirectionalLight));
-
-    DirectionalLight* directionalLightDataSprite = nullptr;
-    directionalLightResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSprite));
-    directionalLightDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
-    directionalLightDataSprite->intensity = 1.0f;
-
     Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceModel = dxCommon->CreateBufferResource(sizeof(DirectionalLight));
 
     // 初始化平行光源的数据
@@ -219,15 +211,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightDataModel->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightDataModel->intensity = 1.0f;
 
-    // VertexShaderで利用するtransformationMatrix用のResourceを作る
-    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
-    // データを書き込む
-    TransformationMatrix* transformationMatrixDataSprite = nullptr;
-    // 書き込むためのアドレスを取得
-    transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-    // 単位行列を書きこんでおく
-    transformationMatrixDataSprite->WVP =  Math::MakeIdentity4x4();
-    transformationMatrixDataSprite->World =  Math::MakeIdentity4x4();
 
     // 定义模型的变换数据
     TransformationMatrix* modelWvpData = nullptr;
@@ -309,54 +292,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
 #pragma endregion
 
-#pragma region Sprite
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite = dxCommon->CreateBufferResource(sizeof(VertexData) * 4);
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-    vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
-    vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
-    vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-    //頂点リソースにデータを書き込む
-    VertexData* vertexDataSprite = nullptr;
-    // 書き込むためのアドレスを取得
-    vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-    // 左下
-    vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
-    vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
-    vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
-    // 左上
-    vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-    vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
-    vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
-    // 右下
-    vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
-    vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
-    vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
-    // 右上
-    vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
-    vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
-    vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
-    D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
-    indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
-    indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
-    indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
-    //頂点リソースにデータを書き込む
-    uint32_t* indexDataSprite = nullptr;
-    // 書き込むためのアドレスを取得
-    indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
-
-    indexDataSprite[0] = 0;
-    indexDataSprite[1] = 1;
-    indexDataSprite[2] = 2;
-    indexDataSprite[3] = 1;
-    indexDataSprite[4] = 3;
-    indexDataSprite[5] = 2;
-
-
-   
-
-#pragma endregion
 
 #pragma region モデル
     // モデル読み込み
@@ -526,11 +461,12 @@ bool showModel = false;
 		}
 
 
-            //uvTransformMatrix用の行列
-            Matrix4x4 uvTransformMatrix =  Math::MakeScaleMatrix(uvTransformSprite.scale);
-            uvTransformMatrix =  Math::Multiply(uvTransformMatrix,  Math::MakeRotateZMatrix(uvTransformSprite.rotate.z));
-            uvTransformMatrix =  Math::Multiply(uvTransformMatrix,  Math::MakeTranslateMatrix(uvTransformSprite.translate));
-            materialDataSprite->uvTransform = uvTransformMatrix;
+            ////uvTransformMatrix用の行列
+            //Matrix4x4 uvTransformMatrix =  Math::MakeScaleMatrix(uvTransformSprite.scale);
+            //uvTransformMatrix =  Math::Multiply(uvTransformMatrix,  Math::MakeRotateZMatrix(uvTransformSprite.rotate.z));
+            //uvTransformMatrix =  Math::Multiply(uvTransformMatrix,  Math::MakeTranslateMatrix(uvTransformSprite.translate));
+            //materialDataSprite->uvTransform = uvTransformMatrix;
+            
             //Model
             transformModel.rotate = modelRotate;
             transformModel.scale = modelScale;
