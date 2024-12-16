@@ -137,16 +137,41 @@ namespace Math {
         return result;
     }
 
-    Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
-        Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
-        Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
-        Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
-        Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-        Matrix4x4 rotateMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix)); // 回転の順序を修正
-        Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
-        Matrix4x4 affineMatrix = Multiply(Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+    Matrix4x4 Math::MakeAffineMatrix(const Vector3& scale, const Vector3& rotation, const Vector3& translation) {
+       	// Scale
+	Matrix4x4 Scale = {0};
+	Scale.m[0][0] = scale.x;
+	Scale.m[1][1] = scale.y;
+	Scale.m[2][2] = scale.z;
+	Scale.m[3][3] = 1;
+	// Rotation
+	Matrix4x4 RotationZ = {0};
+	RotationZ.m[0][0] = cosf(rotation.z);
+	RotationZ.m[0][1] = sinf(rotation.z);
+	RotationZ.m[1][0] = -sinf(rotation.z);
+	RotationZ.m[1][1] = cosf(rotation.z);
+	RotationZ.m[2][2] = RotationZ.m[3][3] = 1;
+	Matrix4x4 RotationX = {0};
+	RotationX.m[1][1] = cosf(rotation.x);
+	RotationX.m[1][2] = sinf(rotation.x);
+	RotationX.m[2][1] = -sinf(rotation.x);
+	RotationX.m[2][2] = cosf(rotation.x);
+	RotationX.m[0][0] = RotationX.m[3][3] = 1;
+	Matrix4x4 RotationY = {0};
+	RotationY.m[0][0] = cosf(rotation.y);
+	RotationY.m[2][0] = sinf(rotation.y);
+	RotationY.m[0][2] = -sinf(rotation.y);
+	RotationY.m[2][2] = cosf(rotation.y);
+	RotationY.m[1][1] = RotationY.m[3][3] = 1;
+	Matrix4x4 Rotation = Multiply(RotationX, Multiply(RotationY, RotationZ));
+	// Translation
+	Matrix4x4 Translation = {0};
+	Translation.m[0][0] = Translation.m[1][1] = Translation.m[2][2] = Translation.m[3][3] = 1;
+	Translation.m[3][0] = translation.x;
+	Translation.m[3][1] = translation.y;
+	Translation.m[3][2] = translation.z;
 
-        return affineMatrix;
+	return Multiply(Scale, Multiply(Rotation, Translation));
     }
 
     Matrix4x4 Math::Inverse(const Matrix4x4& m) {
