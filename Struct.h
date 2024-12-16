@@ -41,11 +41,13 @@ struct TriangleData {
     Transform transform;
 };
 struct Material {
-    Vector4 color;
-    int32_t enableLighting;
-    Matrix4x4 uvTransform;
-    float shininess;
+    Vector4 color;            
+    int32_t enableLighting;  
+    float padding[3];        
+    Matrix4x4 uvTransform;    
+    float shininess;            
 };
+
 struct TransformationMatrix {
     Matrix4x4 WVP;
     Matrix4x4 World;
@@ -64,5 +66,5 @@ struct ModelData {
     MateriaData material;
 };
 struct CameraForGPU {
-    Vector3 worldPsotion;
+    Vector3 worldPosition;
 };

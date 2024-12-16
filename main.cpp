@@ -622,9 +622,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
     rootParameters[3].Descriptor.ShaderRegister = 1; // レジスタ番号0にバインド
 
-    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
-    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
-    rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号0にバインド
+    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 2; 
 
     descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ
@@ -717,16 +717,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialData->shininess = 70;
 
-     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
-    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
-    //マテリアルにデータを書き込む
-    CameraForGPU* cameraData = nullptr;
-    // 書き込むためのアドレスを取得
-    cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
-
-  
-    cameraData->worldPsotion = { 0.0f, 0.0f, -5.0f };
-
     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = CreateBufferResource(device, sizeof(Material));
     //マテリアルにデータを書き込む
@@ -761,6 +751,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     wvpData->World = MakeIdentity4x4(); // 単位行列を書きこんでおく
     wvpData->WVP = MakeIdentity4x4();
 
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device.Get(), sizeof(CameraForGPU));
+	CameraForGPU* cameraData = nullptr;
+	// 書き込むためのアドレスを取得
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+	// 初期値を設定
+	cameraData->worldPosition = { 0.0f, 0.0f, -5.0f };
+
     Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device, sizeof(DirectionalLight));
 
     // 初始化平行光源的数据
@@ -786,8 +784,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightDataModel->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     directionalLightDataModel->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightDataModel->intensity = 1.0f;
-
-
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -1193,13 +1189,13 @@ bool showModel = false;
                 materialData->color.z = ballColor.z;
                 materialData->color.w = ballColor.w;
                 materialData->enableLighting = enableLighting;
-                commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-
-                commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);
+                commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());					// マテリアルCBVを設定
+			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());							// WVP用CBVを設定
+			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);	// SRVのディスクリプタテーブルを設定
+			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());			// ライトのCBVを設定
+			commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
                 commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
+                commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU1);
             }
 
             // 
