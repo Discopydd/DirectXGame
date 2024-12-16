@@ -11,6 +11,8 @@ using namespace Microsoft::WRL;
 using namespace Logger;
 using namespace StringUtility;
 
+const uint32_t DirectXCommon::kMaxSRVCount = 512;
+
 void DirectXCommon::DeviceInitialize()
 {
 #ifdef _DEBUG

@@ -90,6 +90,9 @@ public: // メンバ関数
 
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() const { return srvDescriptorHeap.Get(); }
 
+	// 最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
+
 private: // メンバ変数
 	// ウィンドウズアプリケーション管理
 	WinApp* winApp_ = nullptr;
