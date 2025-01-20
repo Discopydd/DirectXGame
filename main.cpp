@@ -24,6 +24,8 @@
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "TextureManager.h"
+#include "Object3dCommon.h"
+#include "Object3d.h"
 
 MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
     MaterialData materiaData;
@@ -139,7 +141,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon);
 
+    //3Dオブジェクトの初期化
+	Object3dCommon* object3dCommon = nullptr;
+	object3dCommon = new Object3dCommon;
+	object3dCommon->Initialize();
 
+    Object3d* object3d = new Object3d;
+    object3d->Initialize();
 
     // WVP用のリソースを作る。 Matrix4x41つ分のサイズを用意する
     Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
@@ -624,5 +632,8 @@ bool showModel = false;
 	}
 
     delete spriteCommon;
+
+    delete object3dCommon;
+	delete object3d;
 	return 0;
 }
