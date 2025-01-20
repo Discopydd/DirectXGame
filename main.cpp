@@ -144,7 +144,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //3Dオブジェクトの初期化
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon;
-	object3dCommon->Initialize();
+	object3dCommon->Initialize(dxCommon);
 
     Object3d* object3d = new Object3d;
     object3d->Initialize();
@@ -506,6 +506,9 @@ bool showModel = false;
            //     dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
            //     dxCommon->GetCommandList()->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
            // }
+
+           object3dCommon->CommonDraw();
+
 
            // // 
            spriteCommon->CommonDraw();
