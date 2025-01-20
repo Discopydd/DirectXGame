@@ -1,7 +1,9 @@
 #pragma once
 #include "ModelCommon.h"
-#include "ReadingData.h"
-
+#include "MaterialData.h"
+#include"ModelData.h"
+#include"Material.h"
+#include"VertexData.h"
 class Model
 {
 public:

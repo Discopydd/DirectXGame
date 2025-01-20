@@ -116,9 +116,9 @@ void Object3dCommon::GraphicsPipelineInitialize()
 	//三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//shaderをコンパイルする
-	IDxcBlob* vertexsheaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Object3D.VS.hlsl",
+	IDxcBlob* vertexShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Object3D.VS.hlsl",
 		L"vs_6_0");
-	assert(vertexshaderBlob != nullptr);
+	assert(vertexShaderBlob != nullptr);
 	IDxcBlob* pixelShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Object3D.PS.hlsl",
 		L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
@@ -136,8 +136,8 @@ void Object3dCommon::GraphicsPipelineInitialize()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
-	graphicsPipelineStateDesc.VS = { vertexsheaderBlob->GetBufferPointer(),
-	vertexsheaderBlob->GetBufferSize() };//VertexShader
+	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
+	vertexShaderBlob->GetBufferSize() };//VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
 	pixelShaderBlob->GetBufferSize() };//pixelShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//Blendstate
