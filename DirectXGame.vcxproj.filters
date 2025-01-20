@@ -78,6 +78,12 @@
     <ClCompile Include="Object3d.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ModelCommon.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -174,6 +180,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Object3d.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadingData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelCommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
