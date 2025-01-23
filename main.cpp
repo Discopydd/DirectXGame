@@ -622,9 +622,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
     rootParameters[3].Descriptor.ShaderRegister = 1; // レジスタ番号0にバインド
 
-    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[4].Descriptor.ShaderRegister = 2; 
+    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
+    rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号0にバインド
 
     descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ
@@ -690,10 +690,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //三角形の中を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
     // Shaderをコンパイルする
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Resources/shaders/Object3D.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/Object3D.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
     assert(vertexShaderBlob != nullptr);
 
-    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Resources/shaders/Object3D.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/Object3D.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
     assert(pixelShaderBlob != nullptr);
 
 
@@ -716,6 +716,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     materialData->uvTransform = MakeIdentity4x4();
 
     materialData->shininess = 70;
+
+     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
+    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
+    //マテリアルにデータを書き込む
+    CameraForGPU* cameraData = nullptr;
+    // 書き込むためのアドレスを取得
+    cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+
+  
+    cameraData->worldPosition = { 0.0f, 0.0f, -5.0f };
 
     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -745,19 +755,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     materialDataModel->enableLighting = false;
 
     materialDataModel->uvTransform = MakeIdentity4x4();
+
+    materialDataModel->shininess = 70;
     // データを書き込む
     TransformationMatrix* wvpData = nullptr;
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
     wvpData->World = MakeIdentity4x4(); // 単位行列を書きこんでおく
     wvpData->WVP = MakeIdentity4x4();
-
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device.Get(), sizeof(CameraForGPU));
-	CameraForGPU* cameraData = nullptr;
-	// 書き込むためのアドレスを取得
-	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
-	// 初期値を設定
-	cameraData->worldPosition = { 0.0f, 0.0f, -5.0f };
 
     Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device, sizeof(DirectionalLight));
 
@@ -776,14 +780,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightDataSprite->intensity = 1.0f;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceModel = CreateBufferResource(device, sizeof(DirectionalLight));
-
-    // 初始化平行光源的数据
-    DirectionalLight* directionalLightDataModel = nullptr;
-    directionalLightResourceModel->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataModel));
-    directionalLightDataModel->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLightDataModel->direction = { 0.0f, -1.0f, 0.0f };
-    directionalLightDataModel->intensity = 1.0f;
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -1082,7 +1078,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     bool enableLighting = true;
     bool enableLightingSprite = false;
-    bool enableLightingModel = true;
 
     Transform uvTransformSprite{
         {1.0f,1.0f,1.0f},
@@ -1189,13 +1184,13 @@ bool showModel = false;
                 materialData->color.z = ballColor.z;
                 materialData->color.w = ballColor.w;
                 materialData->enableLighting = enableLighting;
-                commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());					// マテリアルCBVを設定
-			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());							// WVP用CBVを設定
-			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);	// SRVのディスクリプタテーブルを設定
-			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());			// ライトのCBVを設定
-			commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+
+                commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);
                 commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
-                commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU1);
             }
 
             // 
@@ -1231,10 +1226,11 @@ bool showModel = false;
                 materialDataModel->color.y = modelColor.y;
                 materialDataModel->color.z = modelColor.z;
                 materialDataModel->color.w = modelColor.w;
-                materialDataModel->enableLighting = enableLightingModel;
+                materialDataModel->enableLighting = enableLighting;
                 commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
                 commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
             }
@@ -1271,11 +1267,7 @@ bool showModel = false;
                 ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
                 ImGui::DragFloat3("Scale", &scale.x, 0.1f);
                 ImGui::Checkbox("useMonsterBall", &useMonsterBall);
-                ImGui::Checkbox("enableLighting", &enableLighting);
-                ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
-                ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
-                directionalLightData->direction = Normalize(directionalLightData->direction);
-                ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+               
             }
 
             if (showSprite) {
@@ -1292,13 +1284,12 @@ bool showModel = false;
                 ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
                 ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
                 ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
-                ImGui::Checkbox("enableLighting", &enableLightingModel);
-                ImGui::ColorEdit4("Light Color", &directionalLightDataModel->color.x);
-                ImGui::DragFloat3("Light Direction", &directionalLightDataModel->direction.x, 0.1f);
-                directionalLightDataModel->direction = Normalize(directionalLightDataModel->direction);
-                ImGui::DragFloat("Light Intensity", &directionalLightDataModel->intensity, 0.1f);
             }
-
+             ImGui::Checkbox("enableLighting", &enableLighting);
+                ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
+                ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
+                directionalLightData->direction = Normalize(directionalLightData->direction);
+                ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
             ImGui::End();
 
 
