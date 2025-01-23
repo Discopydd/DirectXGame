@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DirectXCommon.h"
+#include "../base/DirectXCommon.h"
 
 class ModelCommon
 {

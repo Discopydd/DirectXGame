@@ -1,12 +1,12 @@
 #pragma once
 #include "Object3dCommon.h"
-#include "math/Matrix4x4.h"
-#include "math/Vector4.h"
-#include "math/Vector3.h"
-#include "math/Vector2.h"
-#include"DirectionalLight.h"
-#include"TransformationMatrix.h"
-#include"math/Transform.h"
+#include "../math/Matrix4x4.h"
+#include "../math/Vector4.h"
+#include "../math/Vector3.h"
+#include "../math/Vector2.h"
+#include"../DirectionalLight.h"
+#include"../TransformationMatrix.h"
+#include"../math/Transform.h"
 #include "Model.h"
 
 class Object3dCommon;

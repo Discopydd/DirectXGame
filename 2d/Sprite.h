@@ -1,13 +1,13 @@
 #pragma once
-#include "math/Vector2.h"
-#include "math/Vector3.h"
-#include "math/Vector4.h"
-#include "math/Matrix4x4.h"
-#include "math/Transform.h"
-#include "externals/DirectXTex/d3dx12.h"
-#include"Material.h"
-#include"VertexData.h"
-#include"TransformationMatrix.h"
+#include "../math/Vector2.h"
+#include "../math/Vector3.h"
+#include "../math/Vector4.h"
+#include "../math/Matrix4x4.h"
+#include "../math/Transform.h"
+#include "../externals/DirectXTex/d3dx12.h"
+#include"../3d/Material.h"
+#include"../VertexData.h"
+#include"../TransformationMatrix.h"
 
 
 

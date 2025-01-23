@@ -1,32 +1,23 @@
 #include<Windows.h>
-#include <sstream>
-#include<fstream>
-#include<string>
-#include<format>
-#include <wrl.h>
-#include<random>
-#include <algorithm>
+#include "base/WinApp.h"
+#include "base/DirectXCommon.h"
+#include "base/TextureManager.h"
 
-#include"math/MyMath.h"
-#include"math/Vector3.h"
-#include"MaterialData.h"
-#include"ModelData.h"
-#include"DebugReporter.h"
-#include"Input.h"
-#include"WinApp.h"
-#include <numbers>
-#include "Logger.h"
-#include "DirectXCommon.h"
-#include "D3DResourceLeakChecker.h"
-#include "DirectionalLight.h"
-#include <corecrt_math_defines.h>
-#include "SpriteCommon.h"
-#include "Sprite.h"
-#include "TextureManager.h"
-#include "Object3dCommon.h"
-#include "Object3d.h"
-#include "ModelManager.h"
+#include "input/Input.h"
 
+#include "2d/SpriteCommon.h"
+#include "2d/Sprite.h"
+
+#include "3d/Object3dCommon.h"
+#include "3d/ModelManager.h"
+#include "3d/Object3d.h"
+
+#include "TransformationMatrix.h"
+#include "math/MyMath.h"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -124,7 +115,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Object3d* object3d = new Object3d();
 	object3d->Initialize(object3dCommon);
 	object3d->SetModel("plane.obj");
-
+    
 	//3Dオブジェクトの初期化
 	Object3d* object3d2nd = new Object3d();
 	object3d2nd->Initialize(object3dCommon);
@@ -153,6 +144,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	Vector2 rotation{ 0 };
+    Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
+	Transform transformModel = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+    bool useMonsterBall = false;
     while (true) {
         if (winApp->ProcessMessage()) {
             //ゲームループを抜ける
@@ -170,6 +165,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         object3d2nd->SetRotate(Vector3{ rotation.x, 0.0f, 0.0f });
         object3d2nd->Update();
 
+        
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		ImGui::Begin("Settings");
+        	
+
+		
+		ImGui::End();
+		ImGui::Render();
 
         dxCommon->Begin();
 
@@ -182,9 +187,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Draw();
         }
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
         dxCommon->End();
     }
+    ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
     delete input;
     winApp->Finalize();
     TextureManager::GetInstance()->Finalize();

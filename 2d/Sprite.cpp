@@ -1,8 +1,8 @@
 #include "Sprite.h"
 #include "SpriteCommon.h"
-#include "math/MyMath.h"
-#include "math/Transform.h"
-#include "TextureManager.h"
+#include "../math/MyMath.h"
+#include "../math/Transform.h"
+#include "../base/TextureManager.h"
 
 //初期化
 void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath) {

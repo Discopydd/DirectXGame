@@ -3,6 +3,7 @@
 #include "Model.h"
 #include <map>
 #include <string>
+#include "../base/DirectXCommon.h"
 
 class ModelManager
 {

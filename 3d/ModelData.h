@@ -1,5 +1,5 @@
 #pragma once
-#include "Sprite.h"
+#include "../2d/Sprite.h"
 #include "MaterialData.h"
 #include <vector>
 

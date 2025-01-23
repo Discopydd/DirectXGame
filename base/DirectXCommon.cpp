@@ -3,8 +3,8 @@
 #include <format>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-#include "Logger.h"
-#include "StringUtility.h"
+#include "../Logger.h"
+#include "../base/StringUtility.h"
 
 
 using namespace Microsoft::WRL;

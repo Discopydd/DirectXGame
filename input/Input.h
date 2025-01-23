@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <wrl.h>
 #include<dinput.h>
-#include"WinApp.h"
+#include"../base/WinApp.h"
 class Input {
 public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;

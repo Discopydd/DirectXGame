@@ -1,8 +1,8 @@
 #pragma once
 #include "Windows.h"
 #include <string>
-#include"externals/DirectXTex/DirectXTex.h"
-#include"externals/DirectXTex/d3dx12.h"
+#include"../externals/DirectXTex/DirectXTex.h"
+#include"../externals/DirectXTex/d3dx12.h"
 #include "DirectXCommon.h"
 
 

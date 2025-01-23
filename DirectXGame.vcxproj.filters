@@ -16,131 +16,110 @@
     <Filter Include="头文件\math">
       <UniqueIdentifier>{e9027eb4-f4d1-4419-9c40-311006287ad1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{a451d525-6cd2-4b94-bef2-83f3637f2d05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\2d">
+      <UniqueIdentifier>{04592185-3914-414b-aa65-cb12d049ee27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\3d">
+      <UniqueIdentifier>{59bfb5c4-1d75-46cb-b3e2-5cfa8b9e00c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\base">
+      <UniqueIdentifier>{c37f45ec-d4d0-430c-bd66-2fade8cc5aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\2d">
+      <UniqueIdentifier>{7fa0a124-9cb2-46f5-b9eb-947bd7589bf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\3d">
+      <UniqueIdentifier>{a2c2e71e-addb-4c5e-8dbb-6532b0dabe46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\base">
+      <UniqueIdentifier>{5628cf8d-4b7a-4acf-bea3-f106a2acc158}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WinApp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectXCommon.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Logger.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="StringUtility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="D3DResourceLeakChecker.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteCommon.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="math\MyMath.cpp">
       <Filter>头文件\math</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
+    <ClCompile Include="externals\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="2d\Sprite.cpp">
+      <Filter>源文件\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="2d\SpriteCommon.cpp">
+      <Filter>源文件\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\Model.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\ModelCommon.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\ModelManager.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\Object3d.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\Object3dCommon.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="base\DirectXCommon.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\StringUtility.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\TextureManager.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\WinApp.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Object3dCommon.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Object3d.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelCommon.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelManager.cpp">
+    <ClCompile Include="input\Input.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceObject.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DebugReporter.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WinApp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectXCommon.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StringUtility.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteCommon.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="math\Matrix3x3.h">
@@ -161,12 +140,6 @@
     <ClInclude Include="math\Vector4.h">
       <Filter>头文件\math</Filter>
     </ClInclude>
-    <ClInclude Include="ModelData.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialData.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="math\Transform.h">
       <Filter>头文件\math</Filter>
     </ClInclude>
@@ -176,34 +149,70 @@
     <ClInclude Include="Particle.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Object3dCommon.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Object3d.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ReadingData.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelCommon.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TransformationMatrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="VertexData.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="VertexData.h">
+    <ClInclude Include="externals\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="2d\Sprite.h">
+      <Filter>头文件\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="2d\SpriteCommon.h">
+      <Filter>头文件\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\Material.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\Model.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\ModelCommon.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\ModelData.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\ModelManager.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="base\DirectXCommon.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\StringUtility.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\TextureManager.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\WinApp.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="input\Input.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

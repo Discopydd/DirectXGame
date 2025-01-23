@@ -1,9 +1,9 @@
 #include "Model.h"
-#include "TextureManager.h"
+#include "../base/TextureManager.h"
 #include <fstream>
 #include <sstream>
 #include <assert.h>
-#include "math/MyMath.h"
+#include "../math/MyMath.h"
 
 void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypath, const std::string& filename)
 {
