@@ -755,6 +755,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     materialDataModel->enableLighting = false;
 
     materialDataModel->uvTransform = MakeIdentity4x4();
+
+    materialDataModel->shininess = 70;
     // データを書き込む
     TransformationMatrix* wvpData = nullptr;
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
@@ -777,16 +779,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightDataSprite->intensity = 1.0f;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourceModel = CreateBufferResource(device, sizeof(DirectionalLight));
-
-    // 初始化平行光源的数据
-    DirectionalLight* directionalLightDataModel = nullptr;
-    directionalLightResourceModel->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataModel));
-    directionalLightDataModel->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLightDataModel->direction = { 0.0f, -1.0f, 0.0f };
-    directionalLightDataModel->intensity = 1.0f;
-
 
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
@@ -1086,7 +1078,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     bool enableLighting = true;
     bool enableLightingSprite = false;
-    bool enableLightingModel = true;
 
     Transform uvTransformSprite{
         {1.0f,1.0f,1.0f},
@@ -1235,10 +1226,11 @@ bool showModel = false;
                 materialDataModel->color.y = modelColor.y;
                 materialDataModel->color.z = modelColor.z;
                 materialDataModel->color.w = modelColor.w;
-                materialDataModel->enableLighting = enableLightingModel;
+                materialDataModel->enableLighting = enableLighting;
                 commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourceModel->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
                 commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
             }
@@ -1275,11 +1267,7 @@ bool showModel = false;
                 ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
                 ImGui::DragFloat3("Scale", &scale.x, 0.1f);
                 ImGui::Checkbox("useMonsterBall", &useMonsterBall);
-                ImGui::Checkbox("enableLighting", &enableLighting);
-                ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
-                ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
-                directionalLightData->direction = Normalize(directionalLightData->direction);
-                ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+               
             }
 
             if (showSprite) {
@@ -1296,13 +1284,12 @@ bool showModel = false;
                 ImGui::DragFloat3("Model Translate", &modelTranslate.x, 0.1f);
                 ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
                 ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
-                ImGui::Checkbox("enableLighting", &enableLightingModel);
-                ImGui::ColorEdit4("Light Color", &directionalLightDataModel->color.x);
-                ImGui::DragFloat3("Light Direction", &directionalLightDataModel->direction.x, 0.1f);
-                directionalLightDataModel->direction = Normalize(directionalLightDataModel->direction);
-                ImGui::DragFloat("Light Intensity", &directionalLightDataModel->intensity, 0.1f);
             }
-
+             ImGui::Checkbox("enableLighting", &enableLighting);
+                ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
+                ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
+                directionalLightData->direction = Normalize(directionalLightData->direction);
+                ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
             ImGui::End();
 
 
