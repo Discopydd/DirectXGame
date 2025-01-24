@@ -5,7 +5,7 @@
 #include<string>
 #include<format>
 #include <wrl.h>
-
+#include <numbers>
 
 #include<d3d12.h>
 #include<dxgi1_6.h>
@@ -603,7 +603,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
     // RootParameter作成。PixelShaderのMaterialとVertexShaderのTransform
-    D3D12_ROOT_PARAMETER rootParameters[6] = {};
+    D3D12_ROOT_PARAMETER rootParameters[7] = {};
     // Pixel Shaderで使うMaterialの設定
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
@@ -629,6 +629,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
     rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
     rootParameters[5].Descriptor.ShaderRegister = 3; // レジスタ番号0にバインド
+
+      rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+    rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
+    rootParameters[6].Descriptor.ShaderRegister = 4; // レジスタ番号0にバインド
 
     descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ
@@ -781,17 +785,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DirectionalLight* directionalLightDataSprite = nullptr;
     directionalLightResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightDataSprite));
     directionalLightDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
+    directionalLightDataSprite->direction = { 0.0f, 1.0f, -1.0f };
     directionalLightDataSprite->intensity = 1.0f;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource = CreateBufferResource(device, sizeof(PointLight));
 
     PointLight* pointLightData = nullptr;
     pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-    pointLightData->position = { 1.0f, 1.0f, 1.0f }; // 点光源的位置
+    pointLightData->position = { 0.0f, 1.0f,-1.0f }; // 点光源的位置
     pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 点光源的颜色
     pointLightData->intensity = 1.0f; // 点光源的强度
 
+
+        Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource = CreateBufferResource(device, sizeof(SpotLight));
+
+SpotLight* spotLightData = nullptr;
+spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+
+spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+spotLightData->position = { 0.0f, 2.0f, 5.0f };
+spotLightData->distance = 7.0f;
+spotLightData->direction = Normalize({ 0.0f, 0.0f, 1.0f });
+spotLightData->intensity = 4.0f;
+spotLightData->decay = 2.0f;
+spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -1075,6 +1092,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+
     static ImVec4 ballColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     static ImVec4 spriteColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     static ImVec4 modelColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -1184,7 +1202,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             // 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
+                            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
             // 3D球
             if (showSphere) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -1198,9 +1219,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 materialData->enableLighting = enableLighting;
                 commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+
                 commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);
                 commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
             }
@@ -1241,9 +1260,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 materialDataModel->enableLighting = enableLighting;
                 commandList->SetGraphicsRootConstantBufferView(0, materialResourceModel->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-                commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+
                 commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
                 commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
             }
@@ -1305,12 +1322,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             directionalLightData->direction = Normalize(directionalLightData->direction);
             ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
 
-            // PointLight Controls
             ImGui::Text("Point Light");
             ImGui::ColorEdit4("Point Light Color", &pointLightData->color.x); //
             ImGui::DragFloat3("Point Light Position", &pointLightData->position.x, 0.1f); // 
             ImGui::DragFloat("Point Light Intensity", &pointLightData->intensity,0.1f); // 
+
+                        ImGui::Text("Spot Light");
+ImGui::ColorEdit4("Spot Light Color", &spotLightData->color.x);
+ImGui::DragFloat3("Spot Light Position", &spotLightData->position.x, 0.1f);
+ImGui::DragFloat3("Spot Light Direction", &spotLightData->direction.x, 0.1f);
+spotLightData->direction = Normalize(spotLightData->direction);
+ImGui::DragFloat("Spot Light Distance", &spotLightData->distance, 0.1f);
+ImGui::DragFloat("Spot Light Intensity", &spotLightData->intensity, 0.1f);
+ImGui::DragFloat("Spot Light Decay", &spotLightData->decay, 0.1f);
+ImGui::SliderAngle("Spot Light Angle", &spotLightData->cosAngle, 0.0f, 180.0f);
             ImGui::End();
+
+
 
 
 
