@@ -603,7 +603,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
     // RootParameter作成。PixelShaderのMaterialとVertexShaderのTransform
-    D3D12_ROOT_PARAMETER rootParameters[5] = {};
+    D3D12_ROOT_PARAMETER rootParameters[6] = {};
     // Pixel Shaderで使うMaterialの設定
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
@@ -625,6 +625,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
     rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
     rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号0にバインド
+
+    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // VertexShaderで使う
+    rootParameters[5].Descriptor.ShaderRegister = 3; // レジスタ番号0にバインド
 
     descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ
@@ -717,14 +721,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialData->shininess = 70;
 
-     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
+    //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
     Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
     //マテリアルにデータを書き込む
     CameraForGPU* cameraData = nullptr;
     // 書き込むためのアドレスを取得
     cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 
-  
+
     cameraData->worldPosition = { 0.0f, 0.0f, -5.0f };
 
     //マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
@@ -780,6 +784,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightDataSprite->direction = { 0.0f, -1.0f, 0.0f };
     directionalLightDataSprite->intensity = 1.0f;
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource = CreateBufferResource(device, sizeof(PointLight));
+
+    PointLight* pointLightData = nullptr;
+    pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+    pointLightData->position = { 1.0f, 1.0f, 1.0f }; // 点光源的位置
+    pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 点光源的颜色
+    pointLightData->intensity = 1.0f; // 点光源的强度
+
 
     // VertexShaderで利用するtransformationMatrix用のResourceを作る
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -833,7 +845,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
     assert(SUCCEEDED(hr));
 
-   
+
 
 #pragma endregion
 
@@ -920,7 +932,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     transform.rotate = { 0.0f, 0.0f, 0.0f };
     transform.translate = { 0.0f, 0.0f, 0.0f };
 
-    Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -5.0f} };
+    Transform cameraTransform = { {1.0f, 1.0f, 1.0f}, {0.5f, 0.0f, 0.0f}, {0.0f, 4.0f, -8.0f} };
 #pragma endregion
 
 #pragma region Sprite
@@ -979,7 +991,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region モデル
     // モデル読み込み
-    ModelData modelData = LoadObjFile("Resources", "axis.obj");
+    ModelData modelData = LoadObjFile("Resources/terrain", "terrain.obj");
 
     // 頂点リソースを作成
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceModel = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
@@ -1035,15 +1047,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     srvDesc.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
-    srvDesc2.Format = metadata.format;
+    srvDesc2.Format = metadata2.format;
     srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    srvDesc2.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
+    srvDesc2.Texture2D.MipLevels = static_cast<UINT>(metadata2.mipLevels);
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc3 = {};
-    srvDesc3.Format = metadata.format;
+    srvDesc3.Format = metadata3.format;
     srvDesc3.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc3.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    srvDesc3.Texture2D.MipLevels = static_cast<UINT>(metadata.mipLevels);
+    srvDesc3.Texture2D.MipLevels = static_cast<UINT>(metadata3.mipLevels);
     //SRVを作成する DescriptorHeapの場所を決める
     D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU1, textureSrvHandleCPU2, textureSrvHandleCPU3;
     D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU1, textureSrvHandleGPU2, textureSrvHandleGPU3;
@@ -1070,7 +1082,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     static Vector3 rotate = { 0.0f, 0.0f, 0.0f };
     static Vector3 scale = { 0.5f, 0.5f, 0.5f };
     static Vector3 translateSprite = { 0.0f, 0.0f, 0.0f };
-    static Vector3 modelTranslate = { 0.0f, 0.0f, 0.0f };
+    static Vector3 modelTranslate = { 0.0f, -1.0f, 2.5f };
     static Vector3 modelRotate = { 0.0f, 0.0f, 0.0f };
     static Vector3 modelScale = { 0.5f, 0.5f, 0.5f };
 
@@ -1091,8 +1103,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     };
 
     bool showSphere = true;
-bool showSprite = false;
-bool showModel = false;
+    bool showSprite = false;
+    bool showModel = true;
 
 
     MSG msg{};
@@ -1174,7 +1186,7 @@ bool showModel = false;
             commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
             // 3D球
-                     if (showSphere) {
+            if (showSphere) {
                 commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
                 commandList->IASetIndexBuffer(&indexBufferView);
                 commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1188,7 +1200,7 @@ bool showModel = false;
                 commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-
+                commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU1);
                 commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
             }
@@ -1231,6 +1243,7 @@ bool showModel = false;
                 commandList->SetGraphicsRootConstantBufferView(1, modelWvpResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+                commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
                 commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU3);
                 commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
             }
@@ -1267,7 +1280,7 @@ bool showModel = false;
                 ImGui::DragFloat3("Rotate", &rotate.x, 0.1f);
                 ImGui::DragFloat3("Scale", &scale.x, 0.1f);
                 ImGui::Checkbox("useMonsterBall", &useMonsterBall);
-               
+
             }
 
             if (showSprite) {
@@ -1285,11 +1298,18 @@ bool showModel = false;
                 ImGui::DragFloat3("Model Rotate", &modelRotate.x, 0.1f);
                 ImGui::DragFloat3("Model Scale", &modelScale.x, 0.1f);
             }
-             ImGui::Checkbox("enableLighting", &enableLighting);
-                ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
-                ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
-                directionalLightData->direction = Normalize(directionalLightData->direction);
-                ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+            ImGui::Checkbox("enableLighting", &enableLighting);
+            ImGui::Text("Directional Light");
+            ImGui::ColorEdit4("Light Color", &directionalLightData->color.x);
+            ImGui::DragFloat3("Light Direction", &directionalLightData->direction.x, 0.1f);
+            directionalLightData->direction = Normalize(directionalLightData->direction);
+            ImGui::DragFloat("Light Intensity", &directionalLightData->intensity, 0.1f);
+
+            // PointLight Controls
+            ImGui::Text("Point Light");
+            ImGui::ColorEdit4("Point Light Color", &pointLightData->color.x); //
+            ImGui::DragFloat3("Point Light Position", &pointLightData->position.x, 0.1f); // 
+            ImGui::DragFloat("Point Light Intensity", &pointLightData->intensity,0.1f); // 
             ImGui::End();
 
 
@@ -1338,10 +1358,10 @@ bool showModel = false;
 
     CloseHandle(fenceEvent);
 
-   
+
     DestroyWindow(hwnd);
 
     CoUninitialize();
 
-	return 0;
+    return 0;
 }
