@@ -751,6 +751,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
      
 
+
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceModel = CreateBufferResource(device, sizeof(Material));
     //マテリアルにデータを書き込む
     Material* materialDataModel = nullptr;
