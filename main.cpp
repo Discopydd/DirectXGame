@@ -749,7 +749,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     materialDataSprite->uvTransform = MakeIdentity4x4();
 
-
+     
 
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceModel = CreateBufferResource(device, sizeof(Material));
     //マテリアルにデータを書き込む
