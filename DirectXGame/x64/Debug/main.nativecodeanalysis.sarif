@@ -1,0 +1,453 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "ruleId": "C6387",
+          "message": {
+            "text": "“_Param_(4)”可能是“0”: 这不符合函数“IDxcResult::GetOutput”的规范。"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                },
+                "region": {
+                  "startLine": 236,
+                  "startColumn": 1,
+                  "endLine": 236,
+                  "endColumn": 69
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "CompileShader",
+                  "decoratedName": "?CompileShader@@YAPEAUIDxcBlob@@AEBV?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@PEB_WPEAUIDxcUtils@@PEAUIDxcCompiler3@@PEAUIDxcIncludeHandler@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 186,
+                            "startColumn": 4
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 186,
+                            "startColumn": 24
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 186,
+                            "startColumn": 4
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 186,
+                            "startColumn": 5
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 186,
+                            "startColumn": 4
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 188,
+                            "startColumn": 19
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 189,
+                            "startColumn": 9
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 191,
+                            "startColumn": 1
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 193,
+                            "startColumn": 12
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 194,
+                            "startColumn": 23
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 195,
+                            "startColumn": 25
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 196,
+                            "startColumn": 29
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 201,
+                            "startColumn": 9
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 216,
+                            "startColumn": 13
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 217,
+                            "startColumn": 4
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 229,
+                            "startColumn": 1
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 234,
+                            "startColumn": 15
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                          },
+                          "region": {
+                            "startLine": 236,
+                            "startColumn": 24
+                          }
+                        }
+                      },
+                      "importance": "unimportant"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "C28251",
+          "message": {
+            "text": "“WinMain”的批注不一致: 此实例包含 无批注。请参见 c:\\program files (x86)\\windows kits\\10\\include\\10.0.22621.0\\um\\winbase.h(1037)。"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                },
+                "region": {
+                  "startLine": 277,
+                  "startColumn": 12
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "WinMain",
+                  "decoratedName": "WinMain",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "C6031",
+          "message": {
+            "text": "返回值被忽略: “CoInitializeEx”。"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+                },
+                "region": {
+                  "startLine": 279,
+                  "startColumn": 2,
+                  "endLine": 279,
+                  "endColumn": 26
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "WinMain",
+                  "decoratedName": "WinMain",
+                  "kind": "function"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.39.33523.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///C:/Users/asus/Desktop/CG2/DirectXGame/main.cpp"
+          },
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ],
+          "hashes": {
+            "sha-256": "22149c0bb5735d8d52ca286be027e7c94a2068e021f6f64f6d6447b885278c98"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/struct.h"
+          },
+          "hashes": {
+            "sha-256": "e05d4339dd2390ebe6af40bb58ac6a04d301c36ea195edffb316e06bd45d6352"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/mymath.h"
+          },
+          "hashes": {
+            "sha-256": "f5c052ce7c1b46e7f637e6d39407ae287e0e9098625b58238e2ad6e3abdb2915"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/directxtex/directxtex.h"
+          },
+          "hashes": {
+            "sha-256": "63095f689bac26bbe6265f0cda77c024a7976b930d0027ea494347c939b43be2"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/directxtex/directxtex.inl"
+          },
+          "hashes": {
+            "sha-256": "2896f740bacea922a09cfbd44a3f6a1c85639d07dfa40165927cbf7fed9b22bd"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/directxtex/d3dx12.h"
+          },
+          "hashes": {
+            "sha-256": "8f0a0cf93663da9dbd3e3525ebc8a623daad2b1894b2b6019e0d526594486d11"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/imgui/imgui.h"
+          },
+          "hashes": {
+            "sha-256": "0580c7547e7adc7f5c102ff34e9f2d3face39b86483e463d12f07543b764f11a"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/imgui/imconfig.h"
+          },
+          "hashes": {
+            "sha-256": "8d887055ad9b411a677d7c873f693a511522eb9473353f563b597db9142398c9"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/imgui/imgui_impl_dx12.h"
+          },
+          "hashes": {
+            "sha-256": "fb67acd104a773cd809bd466981f0e421fd548b6d5376c5038ed376fec585de8"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/asus/desktop/cg2/directxgame/externals/imgui/imgui_impl_win32.h"
+          },
+          "hashes": {
+            "sha-256": "7b100c2b93a35b4133a16cd0623b6966472cc36f53986573e53df4980ebe4010"
+          }
+        }
+      ]
+    }
+  ]
+}

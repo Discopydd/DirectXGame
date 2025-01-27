@@ -1,19 +1,19 @@
 #include<Windows.h>
-#include "base/WinApp.h"
-#include "base/DirectXCommon.h"
-#include "base/TextureManager.h"
+#include "WinApp.h"
+#include "DirectXCommon.h"
+#include "TextureManager.h"
 
-#include "input/Input.h"
+#include "Input.h"
 
-#include "2d/SpriteCommon.h"
-#include "2d/Sprite.h"
+#include "SpriteCommon.h"
+#include "Sprite.h"
 
-#include "3d/Object3dCommon.h"
-#include "3d/ModelManager.h"
-#include "3d/Object3d.h"
+#include "Object3dCommon.h"
+#include "ModelManager.h"
+#include "Object3d.h"
 
 #include "TransformationMatrix.h"
-#include "math/MyMath.h"
+#include "MyMath.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -54,15 +54,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ModelManager::GetInstants()->Initialize(dxCommon);
 
   
-
-    // WVP用のリソースを作る。 Matrix4x41つ分のサイズを用意する
-    Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
-
-    // データを書き込む
-    TransformationMatrix* wvpData = nullptr;
-    wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    wvpData->World =  Math::MakeIdentity4x4(); // 単位行列を書きこんでおく
-    wvpData->WVP =  Math::MakeIdentity4x4();
 
 #pragma region 球
 

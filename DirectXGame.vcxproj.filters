@@ -37,6 +37,12 @@
     <Filter Include="源文件\base">
       <UniqueIdentifier>{5628cf8d-4b7a-4acf-bea3-f106a2acc158}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\input">
+      <UniqueIdentifier>{177387ec-9735-4ca5-8bcf-4037b353134b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\input">
+      <UniqueIdentifier>{8978d373-4c8a-4f98-980b-6310ebf9db03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -44,9 +50,6 @@
     </ClCompile>
     <ClCompile Include="D3DResourceLeakChecker.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="math\MyMath.cpp">
-      <Filter>头文件\math</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
@@ -69,44 +72,47 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="2d\Sprite.cpp">
-      <Filter>源文件\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="2d\SpriteCommon.cpp">
-      <Filter>源文件\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="3d\Model.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="3d\ModelCommon.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="3d\ModelManager.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="3d\Object3d.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="3d\Object3dCommon.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="base\DirectXCommon.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\StringUtility.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\TextureManager.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\WinApp.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="input\Input.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="engine\math\MyMath.cpp">
+      <Filter>头文件\math</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\Input.cpp">
+      <Filter>源文件\input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\2d\Sprite.cpp">
+      <Filter>源文件\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\2d\SpriteCommon.cpp">
+      <Filter>源文件\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Model.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ModelCommon.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ModelManager.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Object3d.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Object3dCommon.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\DirectXCommon.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\StringUtility.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\TextureManager.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\WinApp.cpp">
+      <Filter>源文件\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,27 +127,6 @@
     </ClInclude>
     <ClInclude Include="D3DResourceLeakChecker.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Matrix3x3.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Matrix4x4.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\MyMath.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Vector2.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Vector3.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Vector4.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\Transform.h">
-      <Filter>头文件\math</Filter>
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
       <Filter>头文件</Filter>
@@ -179,41 +164,71 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="2d\Sprite.h">
+    <ClInclude Include="engine\math\Matrix3x3.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Matrix4x4.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\MyMath.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Transform.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Vector2.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Vector3.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Vector4.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\Input.h">
+      <Filter>头文件\input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\DirectXCommon.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\StringUtility.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\TextureManager.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\WinApp.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\Material.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\MaterialData.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\Model.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\ModelCommon.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\ModelData.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\ModelManager.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\Object3d.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\Object3dCommon.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\2d\Sprite.h">
       <Filter>头文件\2d</Filter>
     </ClInclude>
-    <ClInclude Include="2d\SpriteCommon.h">
+    <ClInclude Include="engine\2d\SpriteCommon.h">
       <Filter>头文件\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="3d\Material.h">
-      <Filter>头文件\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="3d\Model.h">
-      <Filter>头文件\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="3d\ModelCommon.h">
-      <Filter>头文件\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="3d\ModelData.h">
-      <Filter>头文件\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="3d\ModelManager.h">
-      <Filter>头文件\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="base\DirectXCommon.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\StringUtility.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\TextureManager.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\WinApp.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
-    <ClInclude Include="input\Input.h">
-      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
