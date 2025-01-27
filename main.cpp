@@ -53,7 +53,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     ModelManager::GetInstants()->Initialize(dxCommon);
 
-  
 
 #pragma region 球
 
