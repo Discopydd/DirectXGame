@@ -15,7 +15,7 @@ jobs: # ジョブ定義
     steps: # ジョブ内のステップ
     - name: Checkout # リポジトリのコードをチェックアウト
       uses: actions/checkout@v4
-
+ 
     - name: Add MSBuild to PATH # MSBuild を PATH に追加
       uses: microsoft/setup-msbuild@v2
       with:
