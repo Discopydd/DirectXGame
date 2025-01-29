@@ -12,7 +12,6 @@ env: # 環境変数
 jobs: # ジョブ定義
   build: # ジョブの名前
     runs-on: windows-2022 # Windows 環境で実行
-
     steps: # ジョブ内のステップ
     - name: Checkout # リポジトリのコードをチェックアウト
       uses: actions/checkout@v4
