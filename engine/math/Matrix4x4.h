@@ -14,4 +14,16 @@ struct Matrix4x4 final {
         result.w = m[0][3] * vec.x + m[1][3] * vec.y + m[2][3] * vec.z + m[3][3] * vec.w;
         return result;
     }
+    Matrix4x4 operator*(const Matrix4x4& other) const {
+    Matrix4x4 result = {};
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            result.m[i][j] = 0.0f;
+            for (int k = 0; k < 4; ++k) {
+                result.m[i][j] += m[i][k] * other.m[k][j];
+            }
+        }
+    }
+    return result;
+}
 };

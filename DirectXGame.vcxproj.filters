@@ -114,6 +114,9 @@
     <ClCompile Include="engine\base\WinApp.cpp">
       <Filter>源文件\base</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>源文件\3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceObject.h">
@@ -229,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="engine\2d\SpriteCommon.h">
       <Filter>头文件\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>头文件\3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

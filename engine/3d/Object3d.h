@@ -8,7 +8,7 @@
 #include"TransformationMatrix.h"
 #include"../math/Transform.h"
 #include "Model.h"
-
+#include"Camera.h"
 class Object3dCommon;
 class Object3d {
 
@@ -35,7 +35,8 @@ public:
 	void SetRotate(const Vector3& rotate) { transform.rotate = rotate; }
 	//位置
 	void SetTranslate(const Vector3& translate) { transform.translate = translate; }
-
+	//setter
+	void SetCamera(Camera* camera) { this->camera = camera; };
 private:
 
 	Object3dCommon* object3dCommon_ = nullptr;
@@ -53,6 +54,8 @@ private:
 
 	// SRT
 	Transform transform;
-	// カメラ用のTransformを作る
-	Transform cameraTransform;
+    Matrix4x4 worldMatrix;
+	Matrix4x4 worldViewProjectionMatrix;
+
+	Camera* camera = nullptr;
 };

@@ -95,7 +95,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-
 #pragma region モデル
     // モデル読み込み
     ModelManager::GetInstants()->LoadModel("plane.obj");
