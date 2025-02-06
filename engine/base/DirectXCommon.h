@@ -71,11 +71,9 @@ public: // メンバ関数
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
 
 	//CompileShader関数の作成
-	IDxcBlob* CompileShader(
-		//ComilerするSahaderファイルへのパス
-		const std::wstring& filePath,
-		//compilerに使用するProfile
-		const wchar_t* profile);
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+    const std::wstring& filePath,
+    const wchar_t* profile);
 
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -135,9 +133,9 @@ private: // メンバ変数
 	D3D12_RECT scissorRect{};
 
 	//DXC
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
+Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
+Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 
 	//barrier
 	D3D12_RESOURCE_BARRIER barrier{};

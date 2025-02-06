@@ -105,12 +105,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3d->Initialize(object3dCommon);
 	object3d->SetModel("plane.obj");
     
-	//3Dオブジェクトの初期化
+	//3Dオブジェクトの初期化08
 	Object3d* object3d2nd = new Object3d();
 	object3d2nd->Initialize(object3dCommon);
 	object3d2nd->SetModel("axis.obj");
 #pragma endregion
     
+
+    //カメラの生成
+	Camera* camera = new Camera();
+	camera->SetRotate({ 0,0,0, });
+	camera->SetTranslate({ 0,0,-10, });
+    object3d->SetCamera(camera);
+    object3d2nd->SetCamera(camera);
+	object3dCommon->SetDefaultCamera(camera);
 
     std::string textureFilePath[2]{ "Resources/monsterBall.png" ,"Resources/uvChecker.png" };
     std::vector<Sprite*>sprites;
@@ -142,6 +150,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             //ゲームループを抜ける
             break;
         }
+        camera->Update();
         input->Update();
         for (Sprite* sprite : sprites) {
             sprite->Update();

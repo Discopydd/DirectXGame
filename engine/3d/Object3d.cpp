@@ -5,6 +5,8 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
 	this->object3dCommon_ = object3dCommon;
+	//カメラ用のTransformを作る
+	this->camera = object3dCommon_->GetDefaultCamera();
 
 	#pragma region ModelTransform
 	//ModelTransform用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
@@ -29,8 +31,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	//カメラとモデルのTransform変数
 	transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{1.0f,0.0f,0.0f} };
 
-	//カメラ用のTransformを作る
-	this->camera = object3dCommon_->GetDefaultCamera();
+	
 }
 
 void Object3d::Update()
