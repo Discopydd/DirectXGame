@@ -11,6 +11,8 @@ using namespace Microsoft::WRL;
 using namespace Logger;
 using namespace StringUtility;
 
+const uint32_t DirectXCommon::kMaxSRVCount = 512;
+
 void DirectXCommon::DeviceInitialize()
 {
 #ifdef _DEBUG
@@ -63,6 +65,30 @@ void DirectXCommon::DeviceInitialize()
 	}
 	assert(device != nullptr);
 	Log("Complete create D3D12Device!!!\n");
+	#ifdef _DEBUG
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+		// ヤバイエラー時に止まる
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+		// エラー時に止まる
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+		// 警告時に止まる
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+		// 抑制するメッセージのID
+		D3D12_MESSAGE_ID denyIds[] = {
+			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
+		};
+		// 抑制するレベル
+		D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
+		D3D12_INFO_QUEUE_FILTER filter{};
+		filter.DenyList.NumIDs = _countof(denyIds);
+		filter.DenyList.pIDList = denyIds;
+		filter.DenyList.NumSeverities = _countof(severities);
+		filter.DenyList.pSeverityList = severities;
+		// 指定したメッセージの表示を抑制する
+		infoQueue->PushStorageFilter(&filter);
+	}
+#endif
 #pragma endregion
 }
 
@@ -407,50 +433,58 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(Microsoft::WRL
 }
 
 
-IDxcBlob* DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
 {
 	 Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 
-    Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
-    HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
-    assert(SUCCEEDED(hr));
+  IDxcBlobEncoding* shaderSource = nullptr;
+	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	//読めなかったら止める
+	assert(SUCCEEDED(hr));
+	//読み込んだファイルの内容を設定する
+	DxcBuffer shaderSourceBuffer;
+	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
-    DxcBuffer shaderSourceBuffer;
-    shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-    shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-    shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+	//2.Compileする
+	LPCWSTR arguments[] = {
+		filePath.c_str(),//コンパイル対象のhlslファイル名
+		L"-E",L"main",//エントリーポイントの指定、基本的にmain以外にはしない
+		L"-T",profile,//ShaderProfileの設定
+		L"-Zi",L"-Qembed_debug",//デバック用の情報を埋め込む
+		L"-Od",//最適化を外しておく
+		L"-Zpr",//メモリレイアウトは行優先
+	};
+	//実際にShaderをコンパイルする
+	IDxcResult* shaderResult = nullptr;
+	hr = dxcCompiler->Compile(
+		&shaderSourceBuffer,//読み込んだファイル
+		arguments,          //コンパイルオプション
+		_countof(arguments), //コンパイルオプションの数
+		includeHandler.Get(),      //includeが含まれた諸々
+		IID_PPV_ARGS(&shaderResult)//コンパイル結果
+	);
+	//コンパイルエラーではなくdxcが起動できないなど致命的な状況
+	assert(SUCCEEDED(hr));
 
-    LPCWSTR arguments[] = {
-        filePath.c_str(),
-        L"-E", L"main",
-        L"-T", profile,
-        L"-Zi", L"-Qembed_debug",
-        L"-Od",
-        L"-Zpr",
-    };
+	//3.警告・エラーがでていないか確認する
+	//警告・エラーが出てたらログに出して止める
+	IDxcBlobUtf8* shaderError = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+		Logger::Log(shaderError->GetStringPointer());
+		assert(false);
+	}
 
-    Microsoft::WRL::ComPtr<IDxcResult> shaderResult;
-    hr = dxcCompiler->Compile(
-        &shaderSourceBuffer,
-        arguments,
-        _countof(arguments),
-        includeHandler,
-        IID_PPV_ARGS(&shaderResult));
-    assert(SUCCEEDED(hr));
-
-    Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
-    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-    if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-        Log(shaderError->GetStringPointer());
-        assert(false);
-    }
-
-    IDxcBlob* shaderBlob = nullptr;
-    hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-    assert(SUCCEEDED(hr));
-
-    Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
-    return shaderBlob;
+	//4.Compile結果を受け取って返す
+	//コンパイル結果から実行用のバイナリ部分を取得
+	IDxcBlob* shaderBlob = nullptr;
+	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr));
+	//成功したログを出す
+	Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
+	return shaderBlob;
 }
 
 

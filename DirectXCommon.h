@@ -32,7 +32,7 @@ public: // メンバ関数
 	void ScissorInitialize();
 	void DxcCompilerInitialize();
 	void ImguiInitialize();
-	public:
+public:
 	//初期化
 	void Initialize(WinApp* winApp);
 	//描画前処理
@@ -67,14 +67,12 @@ public: // メンバ関数
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
 		uint32_t descriptorSize, uint32_t index);
 
-	ID3D12Device* GetDevice() const { return device.Get(); }
-	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const { return device.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList()const { return commandList.Get(); }
 
 	//CompileShader関数の作成
-	IDxcBlob* CompileShader(
-		//ComilerするSahaderファイルへのパス
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
-		//compilerに使用するProfile
 		const wchar_t* profile);
 
 
@@ -88,7 +86,10 @@ public: // メンバ関数
 	//テクスチャファイルの読み込み
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
-	ID3D12DescriptorHeap* GetSrvDescriptorHeap() const { return srvDescriptorHeap.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() const { return srvDescriptorHeap.Get(); }
+
+	// 最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
 
 private: // メンバ変数
 	// ウィンドウズアプリケーション管理
@@ -132,9 +133,9 @@ private: // メンバ変数
 	D3D12_RECT scissorRect{};
 
 	//DXC
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 
 	//barrier
 	D3D12_RESOURCE_BARRIER barrier{};
