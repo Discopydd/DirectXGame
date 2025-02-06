@@ -1,0 +1,8 @@
+﻿  main.cpp
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+  コード生成しています。
+  450 of 2742 functions (16.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    389 functions had inline decision re-evaluated but remain unchanged
+  コード生成が終了しました。
+  DirectXGame.vcxproj -> C:\Users\asus\Desktop\CG2\project\x64\Release\DirectXGame.exe
