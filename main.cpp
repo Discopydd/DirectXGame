@@ -166,6 +166,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         dxCommon->Begin();
+        dxCommon->BeginImGui();
+
+        
+
 
         object3dCommon->CommonDraw();
         object3d->Draw();
@@ -176,9 +180,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Draw();
         }
-
+        dxCommon->RenderImGui();
         dxCommon->End();
     }
+    dxCommon->Finalize();
     delete input;
     winApp->Finalize();
     TextureManager::GetInstance()->Finalize();

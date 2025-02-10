@@ -40,6 +40,14 @@ public:
 	//描画後処理
 	void End();
 
+	void Finalize();
+
+
+	void BeginImGui();
+
+    void RenderImGui();
+	void FinalizeImGui();
+
 
 	//SRVの指定番号のCPUデスクリプタハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
