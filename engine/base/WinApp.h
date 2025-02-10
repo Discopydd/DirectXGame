@@ -13,11 +13,10 @@ public:
     static constexpr int32_t kClientWidth = 1280;
     static constexpr int32_t kClientHeight = 720;
 
-    // 初始化窗口
     void Initialize();
-    // 处理
+    // 
     bool ProcessMessage();
-    // 终止
+    // 
     void Finalize();
 
     HWND GetHwnd() const { return hwnd; }
