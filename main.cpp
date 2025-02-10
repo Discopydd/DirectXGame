@@ -163,16 +163,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         object3d2nd->SetRotate(Vector3{ rotation.x, 0.0f, 0.0f });
         object3d2nd->Update();
 
-        
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Settings");
-        	
 
-		
-		ImGui::End();
-		ImGui::Render();
 
         dxCommon->Begin();
 
@@ -185,13 +176,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Draw();
         }
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
 
         dxCommon->End();
     }
-    ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
     delete input;
     winApp->Finalize();
     TextureManager::GetInstance()->Finalize();
