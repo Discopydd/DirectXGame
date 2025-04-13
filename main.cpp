@@ -17,6 +17,10 @@
 #include"MyMath.h"
 #include"DebugReporter.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
@@ -296,69 +300,82 @@ MateriaData LoadMaterialTemplateFile(const std::string& directoryPath, const std
 
 ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename) {
     ModelData modelData;
-    std::vector<Vector4> positions;
-    std::vector<Vector3> normals;
-    std::vector<Vector2> texcoords;
-    std::string line;
+    
+    // 创建Assimp导入器
+    Assimp::Importer importer;
+    std::string filePath = directoryPath + "/" + filename;
+    
+    // 读取文件并应用必要的后处理标志
+    const aiScene* scene = importer.ReadFile(filePath.c_str(), 
+        aiProcess_Triangulate | 
+        aiProcess_FlipWindingOrder | 
+        aiProcess_FlipUVs | 
+        aiProcess_GenNormals | 
+        aiProcess_CalcTangentSpace);
+    
+    // 检查场景是否加载成功
+    if (!scene || !scene->HasMeshes()) {
+        Log("Error loading model: " + filePath + "\n");
+        assert(false);
+        return modelData;
+    }
 
-    std::ifstream file(directoryPath + "/" + filename);
-    assert(file.is_open());  // 确保文件成功打开
-
-
-    while (std::getline(file, line)) {
-        std::istringstream lineStream(line);
-        std::string identifier;
-        lineStream >> identifier;
-
-        if (identifier == "v") {
-            Vector4 position;
-            lineStream >> position.x >> position.y >> position.z;
-            position.w = 1.0f;
-            position.x *= -1.0f;
-            positions.push_back(position);
+    // 解析所有网格
+    for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+        aiMesh* mesh = scene->mMeshes[meshIndex];
+        
+        // 确保网格有法线和纹理坐标
+        if (!mesh->HasNormals() || !mesh->HasTextureCoords(0)) {
+            Log("Mesh missing normals or texture coordinates\n");
+            continue;
         }
-        else if (identifier == "vt") {
-            Vector2 texcoord;
-            lineStream >> texcoord.x >> texcoord.y;
-             texcoord.y = 1.0f - texcoord.y;
-            texcoords.push_back(texcoord);
-        }
-        else if (identifier == "vn") {
-            Vector3 normal;
-            lineStream >> normal.x >> normal.y >> normal.z;
-            normal.x *= -1.0f;
-            normals.push_back(normal);
-        }
-        else if (identifier == "f") {
-        VertexData triangle[3];
-            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-                std::string vertexDefintion;
-                lineStream >> vertexDefintion;
 
-                std::istringstream v(vertexDefintion);
-                uint32_t elementIndices[3];
-                for (int32_t element = 0; element < 3; ++element) {
-                    std::string index;
-                    std::getline(v, index, '/');
-                    elementIndices[element] = std::stoi(index);
-                }
-
-                Vector4 position = positions[elementIndices[0] - 1];
-                Vector2 texcoord = texcoords[elementIndices[1] - 1];
-                Vector3 normal = normals[elementIndices[2] - 1];
-                triangle[faceVertex] = { position, texcoord, normal };
+        // 解析所有面
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+            aiFace face = mesh->mFaces[faceIndex];
+            
+            // 只处理三角形面
+            if (face.mNumIndices != 3) {
+                continue;
             }
-            modelData.vertices.push_back(triangle[2]);
-            modelData.vertices.push_back(triangle[1]);
-            modelData.vertices.push_back(triangle[0]);
-        }else if (identifier == "mtllib") {
 
-            std::string materialFilename;
-            lineStream >> materialFilename;
-            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+            // 解析面的所有顶点
+            for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+                uint32_t vertexIndex = face.mIndices[element];
+                
+                // 获取顶点数据
+                aiVector3D position = mesh->mVertices[vertexIndex];
+                aiVector3D normal = mesh->mNormals[vertexIndex];
+                aiVector3D texcoord = mesh->mTextureCoords[0][vertexIndex];
+                
+                // 创建顶点并转换到左手坐标系
+                VertexData vertex;
+                vertex.position = { -position.x, position.y, position.z, 1.0f }; // 翻转x坐标
+                vertex.normal = { -normal.x, normal.y, normal.z }; // 翻转法线x分量
+                vertex.texcoord = { texcoord.x, 1.0f - texcoord.y }; // 翻转V坐标
+                
+                modelData.vertices.push_back(vertex);
+            }
+        }
     }
+
+    // 解析材质
+    if (scene->HasMaterials()) {
+        for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+            aiMaterial* material = scene->mMaterials[materialIndex];
+            
+            // 获取漫反射纹理
+            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+                aiString texturePath;
+                if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
+                    modelData.material.textureFilePath = directoryPath + "/" + texturePath.C_Str();
+                    break; // 使用第一个找到的漫反射纹理
+                }
+            }
+        }
     }
-     return modelData;
+
+    return modelData;
 }
 
 
