@@ -114,7 +114,7 @@
     <ClCompile Include="engine\base\WinApp.cpp">
       <Filter>源文件\base</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="engine\3d\Camera.cpp">
       <Filter>源文件\3d</Filter>
     </ClCompile>
   </ItemGroup>
@@ -129,9 +129,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Particle.h">
@@ -233,7 +230,10 @@
     <ClInclude Include="engine\2d\SpriteCommon.h">
       <Filter>头文件\2d</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="engine\3d\Camera.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\DirectionalLight.h">
       <Filter>头文件\3d</Filter>
     </ClInclude>
   </ItemGroup>
