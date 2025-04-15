@@ -155,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Update();
         }
-        rotation += 0.03f;
+        rotation += 0.01f;
 
         object3d->SetRotate(Vector3{ 0.0f, rotation.x, 0.0f });
         object3d->Update();
@@ -168,7 +168,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         dxCommon->Begin();
         dxCommon->BeginImGui();
 
-        
+        ImGui::Begin("Camera Controller");
+
+        // 获取当前的相机状态（每帧更新，避免 static 保持旧值）
+        Vector3 currentPos = camera->GetTransform().translate;
+        Vector3 currentRot = camera->GetTransform().rotate;
+
+        float cameraPos[3] = { currentPos.x, currentPos.y, currentPos.z };
+        float cameraRot[3] = { currentRot.x, currentRot.y, currentRot.z };
+
+        if (ImGui::DragFloat3("Position", cameraPos, 0.1f)) {
+            camera->SetTranslate({ cameraPos[0], cameraPos[1], cameraPos[2] });
+        }
+        if (ImGui::DragFloat3("Rotation", cameraRot, 0.1f)) {
+            camera->SetRotate({ cameraRot[0], cameraRot[1], cameraRot[2] });
+        }
+
+        float fov = camera->GetProjectionMatrix().m[1][1];
+        if (ImGui::SliderFloat("FOV", &fov, 0.1f, 3.0f)) {
+            camera->SetFovY(fov);
+        }
+
+        ImGui::End();
+
 
 
         object3dCommon->CommonDraw();
