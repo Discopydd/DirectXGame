@@ -119,7 +119,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d->SetCamera(camera);
     object3d2nd->SetCamera(camera);
 	object3dCommon->SetDefaultCamera(camera);
-
+     
     std::string textureFilePath[2]{ "Resources/monsterBall.png" ,"Resources/uvChecker.png" };
     std::vector<Sprite*>sprites;
 	for (uint32_t i = 0; i < 1; ++i) {
