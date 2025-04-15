@@ -14,7 +14,7 @@
 
 #include "TransformationMatrix.h"
 #include "MyMath.h"
-
+#include "SrvManager.h"
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -41,9 +41,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     SpriteCommon* spriteCommon = nullptr;
     spriteCommon = new SpriteCommon;
     spriteCommon->Initialize(dxCommon);
-
+    //SRVマネージャ
+ 	SrvManager* srvManager = nullptr;
+ 	srvManager = new SrvManager();
+ 	srvManager->Initialize(dxCommon);
     //テクスチャマネージャの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
 
     //3Dオブジェクトの初期化
 	Object3dCommon* object3dCommon = nullptr;
@@ -166,32 +169,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         dxCommon->Begin();
-        dxCommon->BeginImGui();
-
-        ImGui::Begin("Camera Controller");
-
-        // 获取当前的相机状态（每帧更新，避免 static 保持旧值）
-        Vector3 currentPos = camera->GetTransform().translate;
-        Vector3 currentRot = camera->GetTransform().rotate;
-
-        float cameraPos[3] = { currentPos.x, currentPos.y, currentPos.z };
-        float cameraRot[3] = { currentRot.x, currentRot.y, currentRot.z };
-
-        if (ImGui::DragFloat3("Position", cameraPos, 0.1f)) {
-            camera->SetTranslate({ cameraPos[0], cameraPos[1], cameraPos[2] });
-        }
-        if (ImGui::DragFloat3("Rotation", cameraRot, 0.1f)) {
-            camera->SetRotate({ cameraRot[0], cameraRot[1], cameraRot[2] });
-        }
-
-        float fov = camera->GetProjectionMatrix().m[1][1];
-        if (ImGui::SliderFloat("FOV", &fov, 0.1f, 3.0f)) {
-            camera->SetFovY(fov);
-        }
-
-        ImGui::End();
+        //dxCommon->BeginImGui();
 
 
+        srvManager->PreDraw();
 
         object3dCommon->CommonDraw();
         object3d->Draw();
@@ -202,7 +183,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Draw();
         }
-        dxCommon->RenderImGui();
+        //dxCommon->RenderImGui();
         dxCommon->End();
     }
     dxCommon->Finalize();
@@ -217,7 +198,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
     delete spriteCommon;
-
+    delete srvManager;
     delete object3dCommon;
 	delete object3d;
     delete object3d2nd;

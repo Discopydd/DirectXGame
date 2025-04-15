@@ -8,7 +8,7 @@
 #include"../3d/Material.h"
 #include"VertexData.h"
 #include"TransformationMatrix.h"
-
+#include "SrvManager.h"
 
 
 class SpriteCommon;
@@ -62,6 +62,7 @@ private:
 	void AdjustTextureSize();
 
 	SpriteCommon* spriteCommon = nullptr;
+	SrvManager* srvManager = nullptr;
 	//頂点データ作成
 	void VertexDataCreate();
 	//index作成
@@ -100,7 +101,8 @@ private:
 	bool isFlipX_ = false;
 	// 上下フリップ
 	bool isFlipY_ = false;
-
+	//ファイルパス
+ 	std::string filePath;
 	//テクスチャ左上座標
 	Vector2 textureLeftTop_ = { 0.0f,0.0f };
 	//テクスチャ切り出しサイズ

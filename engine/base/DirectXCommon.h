@@ -94,8 +94,10 @@ public:
 	//テクスチャファイルの読み込み
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrvDescriptorHeap() const { return srvDescriptorHeap.Get(); }
-
+	//デスクリプタヒープを生成
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>
+		CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType,
+			UINT numDescriptrs, bool shaderVisible);
 	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
 
@@ -118,11 +120,9 @@ private: // メンバ変数
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
 
-	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -151,9 +151,7 @@ private: // メンバ変数
 	std::chrono::steady_clock::time_point reference_;
 
 private: // メンバ関数
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>
-		CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType,
-			UINT numDescriptrs, bool shaderVisible);
+
 
 	//FPS固定初期化
 	void InitializeFixFPS();

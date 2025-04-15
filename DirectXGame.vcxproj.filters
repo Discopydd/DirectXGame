@@ -117,6 +117,9 @@
     <ClCompile Include="engine\3d\Camera.cpp">
       <Filter>源文件\3d</Filter>
     </ClCompile>
+    <ClCompile Include="SrvManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceObject.h">
@@ -235,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="engine\3d\DirectionalLight.h">
       <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="SrvManager.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

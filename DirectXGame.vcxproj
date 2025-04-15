@@ -190,6 +190,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SrvManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3DResourceLeakChecker.h" />
@@ -229,6 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ResourceObject.h" />
+    <ClInclude Include="SrvManager.h" />
     <ClInclude Include="TransformationMatrix.h" />
     <ClInclude Include="VertexData.h" />
   </ItemGroup>
