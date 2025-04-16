@@ -1,192 +1,132 @@
-#include<Windows.h>
+#include <Windows.h>
+#include <ImGuiManager.h>
 #include "WinApp.h"
 #include "DirectXCommon.h"
-#include "TextureManager.h"
-
 #include "Input.h"
-
+#include "TextureManager.h"
+#include "SrvManager.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
-
 #include "Object3dCommon.h"
-#include "ModelManager.h"
 #include "Object3d.h"
-
+#include "ModelManager.h"
 #include "TransformationMatrix.h"
 #include "MyMath.h"
-#include "SrvManager.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-#include <ImGuiManager.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-
-
-    WinApp* winApp = nullptr;
-    DirectXCommon* dxCommon = nullptr;
-	Input* input = nullptr;
-
-    //Windowの生成
-    winApp = new WinApp();
+    // ----------------------------------------
+    // 基本システム初期化
+    // ----------------------------------------
+    auto* winApp = new WinApp();
     winApp->Initialize();
 
-    // DX初期化
-	dxCommon = new DirectXCommon;
-	dxCommon->Initialize(winApp);
+    auto* dxCommon = new DirectXCommon();
+    dxCommon->Initialize(winApp);
 
-	// 入力初期化
-	input = new Input();
-	input->Initialize(winApp);
+    auto* input = new Input();
+    input->Initialize(winApp);
 
-    SpriteCommon* spriteCommon = nullptr;
-    spriteCommon = new SpriteCommon;
+    auto* spriteCommon = new SpriteCommon();
     spriteCommon->Initialize(dxCommon);
-    //SRVマネージャ
- 	SrvManager* srvManager = nullptr;
- 	srvManager = new SrvManager();
- 	srvManager->Initialize(dxCommon);
-    //テクスチャマネージャの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
-    //ImGuiマネージャ
- 	ImGuiManager* imguimanager = new ImGuiManager();
- 	imguimanager->Initialize(winApp,dxCommon,srvManager);
-    //3Dオブジェクトの初期化
-	Object3dCommon* object3dCommon = nullptr;
-	object3dCommon = new Object3dCommon;
-	object3dCommon->Initialize(dxCommon);
 
+    auto* srvManager = new SrvManager();
+    srvManager->Initialize(dxCommon);
+
+    TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
+
+    auto* imguimanager = new ImGuiManager();
+    imguimanager->Initialize(winApp, dxCommon, srvManager);
+
+    auto* object3dCommon = new Object3dCommon();
+    object3dCommon->Initialize(dxCommon);
 
     ModelManager::GetInstants()->Initialize(dxCommon);
 
+    // ----------------------------------------
+    // カメラ
+    // ----------------------------------------
+    auto* camera = new Camera();
+    camera->SetRotate({ 0, 0, 0 });
+    camera->SetTranslate({ 0, 0, -10 });
 
-#pragma region 球
+    object3dCommon->SetDefaultCamera(camera);
 
-    const uint32_t kSubdivision = 16; // 分割数
-    const uint32_t numVertices = (kSubdivision + 1) * (kSubdivision + 1);
-    const uint32_t numIndices = kSubdivision * kSubdivision * 6;
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = dxCommon->CreateBufferResource(sizeof(VertexData) * numVertices);
-
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * numVertices;
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-    //頂点リソースにデータを書き込む
-    VertexData* vertexData = nullptr;
-    // 書き込むためのアドレスを取得
-    vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-    const float kLonEvery = 2 * (float)M_PI / (float)kSubdivision; // 经度分割1つの角度
-    const float kLatEvery = (float)M_PI / (float)kSubdivision; // 纬度分割1つの角度
-
-    uint32_t vertexIndex = 0;
-    for (uint32_t latIndex = 0; latIndex <= kSubdivision; ++latIndex) {
-        float lat = -(float)M_PI / 2.0f + kLatEvery * latIndex; // 現在の緯度
-        for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex) {
-            float lon = lonIndex * kLonEvery; // 現在の経度
-
-            vertexData[vertexIndex].position.x = cos(lat) * cos(lon);
-            vertexData[vertexIndex].position.y = sin(lat);
-            vertexData[vertexIndex].position.z = cos(lat) * sin(lon);
-            vertexData[vertexIndex].position.w = 1.0f;
-            vertexData[vertexIndex].texcoord.x = (float)lonIndex / (float)kSubdivision;
-            vertexData[vertexIndex].texcoord.y = 1.0f - (float)latIndex / (float)kSubdivision;
-            vertexData[vertexIndex].normal.x = vertexData[vertexIndex].position.x;
-            vertexData[vertexIndex].normal.y = vertexData[vertexIndex].position.y;
-            vertexData[vertexIndex].normal.z = vertexData[vertexIndex].position.z;
-            ++vertexIndex;
-        }
-    }
-    
-
-#pragma endregion
-
-#pragma region モデル
-    // モデル読み込み
+    // ----------------------------------------
+    // モデル読み込みと設定
+    // ----------------------------------------
     ModelManager::GetInstants()->LoadModel("plane.obj");
-	ModelManager::GetInstants()->LoadModel("axis.obj");
+    ModelManager::GetInstants()->LoadModel("axis.obj");
 
-	//3Dオブジェクトの初期化
-	Object3d* object3d = new Object3d();
-	object3d->Initialize(object3dCommon);
-	object3d->SetModel("plane.obj");
-    
-	//3Dオブジェクトの初期化08
-	Object3d* object3d2nd = new Object3d();
-	object3d2nd->Initialize(object3dCommon);
-	object3d2nd->SetModel("axis.obj");
-#pragma endregion
-    
-
-    //カメラの生成
-	Camera* camera = new Camera();
-	camera->SetRotate({ 0,0,0, });
-	camera->SetTranslate({ 0,0,-10, });
+    auto* object3d = new Object3d();
+    object3d->Initialize(object3dCommon);
+    object3d->SetModel("plane.obj");
     object3d->SetCamera(camera);
+
+    auto* object3d2nd = new Object3d();
+    object3d2nd->Initialize(object3dCommon);
+    object3d2nd->SetModel("axis.obj");
     object3d2nd->SetCamera(camera);
-	object3dCommon->SetDefaultCamera(camera);
-     
-    std::string textureFilePath[2]{ "Resources/monsterBall.png" ,"Resources/uvChecker.png" };
-    std::vector<Sprite*>sprites;
-	for (uint32_t i = 0; i < 1; ++i) {
-		Sprite* sprite = new Sprite();
-		sprite->Initialize(spriteCommon, textureFilePath[1]);
-		sprites.push_back(sprite);
-	}
-    int i = 0;
-	for (Sprite* sprite : sprites) {
-		Vector2 position = sprite->GetPosition();
 
-		position.x = 200.0f * i;
-		position.y = 0.0f;
+    // ----------------------------------------
+    // スプライト生成
+    // ----------------------------------------
+    std::string textureFilePath[] = { "Resources/monsterBall.png", "Resources/uvChecker.png" };
+    std::vector<Sprite*> sprites;
 
-		sprite->SetPosition(position);
-		sprite->SetAnchorPoint(Vector2{ 0.0f,0.0f });
-		sprite->SetIsFlipY(0);
-		i++;
-	}
+    for (uint32_t i = 0; i < 1; ++i) {
+        auto* sprite = new Sprite();
+        sprite->Initialize(spriteCommon, textureFilePath[1]);
+        sprite->SetPosition({ 200.0f * i, 0.0f });
+        sprite->SetAnchorPoint({ 0.0f, 0.0f });
+        sprite->SetIsFlipY(false);
+        sprites.push_back(sprite);
+    }
 
-	Vector2 rotation{ 0 };
-    Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-
-	Transform transformModel = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+    // ----------------------------------------
+    // Transform 初期化
+    // ----------------------------------------
+    Vector2 rotation = { 0 };
+    Transform transform = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
+    Transform transformModel = transform;
     bool useMonsterBall = false;
-    while (true) {
-        if (winApp->ProcessMessage()) {
-            //ゲームループを抜ける
-            break;
-        }
-        camera->Update();
-        //ImGui開始
- 		imguimanager->Begin();
 
-        //入力の更新
- 		input->Update();
-        for (Sprite* sprite : sprites) {
+    // ----------------------------------------
+    // メインループ
+    // ----------------------------------------
+    while (true) {
+        if (winApp->ProcessMessage()) break;
+
+        camera->Update();
+        imguimanager->Begin();
+        input->Update();
+
+        for (auto* sprite : sprites) {
             sprite->Update();
         }
+
         rotation += 0.01f;
-
-        object3d->SetRotate(Vector3{ 0.0f, rotation.x, 0.0f });
+        object3d->SetRotate({ 0.0f, rotation.x, 0.0f });
+        object3d2nd->SetRotate({ rotation.x, 0.0f, 0.0f });
         object3d->Update();
-
-        object3d2nd->SetRotate(Vector3{ rotation.x, 0.0f, 0.0f });
         object3d2nd->Update();
-        #ifdef USE_IMGUI
-          ImGui::Begin("Camera Controller");
 
-        // 获取当前的相机状态（每帧更新，避免 static 保持旧值）
-        Vector3 currentPos = camera->GetTransform().translate;
-        Vector3 currentRot = camera->GetTransform().rotate;
+#ifdef USE_IMGUI
+        ImGui::Begin("Camera Controller");
 
-        float cameraPos[3] = { currentPos.x, currentPos.y, currentPos.z };
-        float cameraRot[3] = { currentRot.x, currentRot.y, currentRot.z };
+        Vector3 camPos = camera->GetTransform().translate;
+        Vector3 camRot = camera->GetTransform().rotate;
+        float camPosArr[3] = { camPos.x, camPos.y, camPos.z };
+        float camRotArr[3] = { camRot.x, camRot.y, camRot.z };
 
-        if (ImGui::DragFloat3("Position", cameraPos, 0.1f)) {
-            camera->SetTranslate({ cameraPos[0], cameraPos[1], cameraPos[2] });
+        if (ImGui::DragFloat3("Position", camPosArr, 0.1f)) {
+            camera->SetTranslate({ camPosArr[0], camPosArr[1], camPosArr[2] });
         }
-        if (ImGui::DragFloat3("Rotation", cameraRot, 0.1f)) {
-            camera->SetRotate({ cameraRot[0], cameraRot[1], cameraRot[2] });
+        if (ImGui::DragFloat3("Rotation", camRotArr, 0.1f)) {
+            camera->SetRotate({ camRotArr[0], camRotArr[1], camRotArr[2] });
         }
 
         float fov = camera->GetProjectionMatrix().m[1][1];
@@ -195,48 +135,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         }
 
         ImGui::End();
-        #endif
-        //ImGui終了
- 		imguimanager->End();
+#endif
+
+        imguimanager->End();
 
         dxCommon->Begin();
-       
-
-
         srvManager->PreDraw();
-
         object3dCommon->CommonDraw();
         object3d->Draw();
         object3d2nd->Draw();
-
         spriteCommon->CommonDraw();
 
-        for (Sprite* sprite : sprites) {
+        for (auto* sprite : sprites) {
             sprite->Draw();
         }
-        //ImGui描画
- 		imguimanager->Draw();
-        //dxCommon->RenderImGui();
-        dxCommon->End();
 
+        imguimanager->Draw();
+        dxCommon->End();
     }
+
+    // ----------------------------------------
+    // 終了処理
+    // ----------------------------------------
     dxCommon->Finalize();
-    delete input;
     winApp->Finalize();
     TextureManager::GetInstance()->Finalize();
-	ModelManager::GetInstants()->Finalize();
+    ModelManager::GetInstants()->Finalize();
     imguimanager->Finalize();
+
+    delete camera;
+    delete input;
     delete winApp;
     delete dxCommon;
-    for (Sprite* sprite : sprites) {
-		delete sprite;
-	}
-
     delete spriteCommon;
     delete srvManager;
     delete object3dCommon;
-	delete object3d;
+    delete object3d;
     delete object3d2nd;
+    delete imguimanager;
 
-	return 0;
+    for (auto* sprite : sprites) {
+        delete sprite;
+    }
+
+    return 0;
 }

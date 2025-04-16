@@ -6,11 +6,37 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="头文件">
-      <UniqueIdentifier>{b19da896-e4f8-4eee-86b7-c6d4cb17a685}</UniqueIdentifier>
+      <UniqueIdentifier>{192d2d01-cbd9-4c31-9d4a-8d8746b45c29}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件">
-      <UniqueIdentifier>{950cf968-8842-4369-bce7-8221ae48127f}</UniqueIdentifier>
+      <UniqueIdentifier>{c3feb585-7ba2-4243-baef-8087cdd741b2}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imgui.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_demo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_draw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_dx12.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_win32.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_tables.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_widgets.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imconfig.h">
@@ -37,31 +63,5 @@
     <ClInclude Include="imstb_truetype.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="imgui.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_demo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_draw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_impl_dx12.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_impl_win32.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_tables.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_widgets.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="LICENSE.txt" />
   </ItemGroup>
 </Project>
