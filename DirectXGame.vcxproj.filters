@@ -16,9 +16,6 @@
     <Filter Include="头文件\math">
       <UniqueIdentifier>{e9027eb4-f4d1-4419-9c40-311006287ad1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{a451d525-6cd2-4b94-bef2-83f3637f2d05}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\2d">
       <UniqueIdentifier>{04592185-3914-414b-aa65-cb12d049ee27}</UniqueIdentifier>
     </Filter>
@@ -50,27 +47,6 @@
     </ClCompile>
     <ClCompile Include="D3DResourceLeakChecker.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
@@ -120,6 +96,9 @@
     <ClCompile Include="SrvManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ImGuiManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceObject.h">
@@ -142,30 +121,6 @@
     </ClInclude>
     <ClInclude Include="VertexData.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Matrix3x3.h">
       <Filter>头文件\math</Filter>
@@ -240,6 +195,9 @@
       <Filter>头文件\3d</Filter>
     </ClInclude>
     <ClInclude Include="SrvManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

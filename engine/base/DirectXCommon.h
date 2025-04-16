@@ -101,6 +101,8 @@ public:
 	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
 
+	size_t GetSwapChainResourcesNum()const { return swapChainDesc.BufferCount; }
+ 
 private: // メンバ変数
 	// ウィンドウズアプリケーション管理
 	WinApp* winApp_ = nullptr;

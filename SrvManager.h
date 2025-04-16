@@ -21,6 +21,8 @@ public://初期化
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 	//最大SRV数(最大テクスチャ数)
 	static const uint32_t kMaxSRVCount;
+	//デスクリプタハンドル取得
+ 	ID3D12DescriptorHeap* GetDescriptorHeap() { return descriptorHeap.Get(); }
 private:
 	DirectXCommon* directXCommon = nullptr;
 	//SRV用DescriptorSizeを取得

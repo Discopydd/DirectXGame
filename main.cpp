@@ -18,6 +18,7 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <ImGuiManager.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -47,7 +48,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
  	srvManager->Initialize(dxCommon);
     //テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
-
+    //ImGuiマネージャ
+ 	ImGuiManager* imguimanager = new ImGuiManager();
+ 	imguimanager->Initialize(winApp,dxCommon,srvManager);
     //3Dオブジェクトの初期化
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon;
@@ -154,7 +157,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             break;
         }
         camera->Update();
-        input->Update();
+        //ImGui開始
+ 		imguimanager->Begin();
+
+        //入力の更新
+ 		input->Update();
         for (Sprite* sprite : sprites) {
             sprite->Update();
         }
@@ -165,11 +172,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         object3d2nd->SetRotate(Vector3{ rotation.x, 0.0f, 0.0f });
         object3d2nd->Update();
+        #ifdef USE_IMGUI
+          ImGui::Begin("Camera Controller");
 
+        // 获取当前的相机状态（每帧更新，避免 static 保持旧值）
+        Vector3 currentPos = camera->GetTransform().translate;
+        Vector3 currentRot = camera->GetTransform().rotate;
 
+        float cameraPos[3] = { currentPos.x, currentPos.y, currentPos.z };
+        float cameraRot[3] = { currentRot.x, currentRot.y, currentRot.z };
+
+        if (ImGui::DragFloat3("Position", cameraPos, 0.1f)) {
+            camera->SetTranslate({ cameraPos[0], cameraPos[1], cameraPos[2] });
+        }
+        if (ImGui::DragFloat3("Rotation", cameraRot, 0.1f)) {
+            camera->SetRotate({ cameraRot[0], cameraRot[1], cameraRot[2] });
+        }
+
+        float fov = camera->GetProjectionMatrix().m[1][1];
+        if (ImGui::SliderFloat("FOV", &fov, 0.1f, 3.0f)) {
+            camera->SetFovY(fov);
+        }
+
+        ImGui::End();
+        #endif
+        //ImGui終了
+ 		imguimanager->End();
 
         dxCommon->Begin();
-        //dxCommon->BeginImGui();
+       
 
 
         srvManager->PreDraw();
@@ -183,14 +214,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (Sprite* sprite : sprites) {
             sprite->Draw();
         }
+        //ImGui描画
+ 		imguimanager->Draw();
         //dxCommon->RenderImGui();
         dxCommon->End();
+
     }
     dxCommon->Finalize();
     delete input;
     winApp->Finalize();
     TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstants()->Finalize();
+    imguimanager->Finalize();
     delete winApp;
     delete dxCommon;
     for (Sprite* sprite : sprites) {
