@@ -93,11 +93,11 @@
     <ClCompile Include="engine\3d\Camera.cpp">
       <Filter>源文件\3d</Filter>
     </ClCompile>
-    <ClCompile Include="SrvManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="engine\base\ImGuiManager.cpp">
+      <Filter>源文件\base</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="engine\base\SrvManager.cpp">
+      <Filter>源文件\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -194,11 +194,11 @@
     <ClInclude Include="engine\3d\DirectionalLight.h">
       <Filter>头文件\3d</Filter>
     </ClInclude>
-    <ClInclude Include="SrvManager.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="engine\base\ImGuiManager.h">
+      <Filter>头文件\base</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiManager.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="engine\base\SrvManager.h">
+      <Filter>头文件\base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
