@@ -12,6 +12,8 @@
 #include "ModelManager.h"
 #include "TransformationMatrix.h"
 #include "MyMath.h"
+#include "ParticleManager.h"
+#include "ParticleEmitter.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -85,7 +87,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         sprite->SetIsFlipY(false);
         sprites.push_back(sprite);
     }
-
+    //パーティクルマネージャ
+	ParticleManager::GetInstance()->Initialize(dxCommon, srvManager,camera);
+	ParticleManager::GetInstance()->CreateparticleGroup("particle", "resources/circle.png");
+	//パーティクルエミッター
+	ParticleEmitter* particleEmitter = new ParticleEmitter();
+	particleEmitter->Initialize("particle");
     // ----------------------------------------
     // Transform 初期化
     // ----------------------------------------
@@ -107,7 +114,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (auto* sprite : sprites) {
             sprite->Update();
         }
-
+        //パーティクル更新
+        particleEmitter->Update();
+        ParticleManager::GetInstance()->Update();
         rotation += 0.01f;
         object3d->SetRotate({ 0.0f, rotation.x, 0.0f });
         object3d2nd->SetRotate({ rotation.x, 0.0f, 0.0f });
@@ -129,12 +138,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             camera->SetRotate({ camRotArr[0], camRotArr[1], camRotArr[2] });
         }
 
-        float fov = camera->GetProjectionMatrix().m[1][1];
-        if (ImGui::SliderFloat("FOV", &fov, 0.1f, 3.0f)) {
-            camera->SetFovY(fov);
-        }
+        ImGui::End();
+        ImGui::Begin("Particle Controller");
+
+        static int count = 1;
+        static float frequency = 0.1f;
+        static float position[3] = { 0.0f, 0.0f, 0.0f };
+
+        ImGui::SliderInt("Count", &count, 1, 100);
+        ImGui::SliderFloat("Frequency", &frequency, 0.01f, 5.0f);
+        ImGui::DragFloat3("Position", position, 0.1f);
+
+        static bool autoEmit = true;
+        ImGui::Checkbox("Auto Emit", &autoEmit);
+        particleEmitter->SetIsAutoEmit(autoEmit);
+
+        // 把 GUI 数值更新到 Emitter
+        particleEmitter->SetCount(count);
+        particleEmitter->SetFrequency(frequency);
+        particleEmitter->SetPosition({ position[0], position[1], position[2] });
 
         ImGui::End();
+
 #endif
 
         imguimanager->End();
@@ -149,7 +174,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         for (auto* sprite : sprites) {
             sprite->Draw();
         }
-
+        //パーティクル描画
+        ParticleManager::GetInstance()->Draw();
         imguimanager->Draw();
         dxCommon->End();
     }
@@ -159,6 +185,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // ----------------------------------------
     dxCommon->Finalize();
     winApp->Finalize();
+   
+
+	ParticleManager::GetInstance()->Finalize();
     TextureManager::GetInstance()->Finalize();
     ModelManager::GetInstants()->Finalize();
     imguimanager->Finalize();
@@ -173,7 +202,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete object3d;
     delete object3d2nd;
     delete imguimanager;
-
+    delete particleEmitter;
     for (auto* sprite : sprites) {
         delete sprite;
     }

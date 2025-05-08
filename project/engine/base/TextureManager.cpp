@@ -62,6 +62,17 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 		textureData.metadata.format, UINT(textureData.metadata.mipLevels));
 
 }
+//SRVインデックスの開始番号
+uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath) {
+	//読み込み済みテクスチャデータを検索
+	auto it = textureDatas.find(filePath);
+
+	if (it != textureDatas.end()) {
+		return it->second.srvIndex;
+	}
+
+	return 0;
+}
 //SRVインデックスの取得
 uint32_t TextureManager::GetSrvIndex(const std::string& filePath) {
 	TextureData& textureData = textureDatas[filePath];

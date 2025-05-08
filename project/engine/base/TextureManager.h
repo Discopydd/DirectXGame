@@ -44,7 +44,8 @@ public:
 
 	//テクスチャファイルの読み込み
 	void LoadTexture(const std::string& filePath);
-
+	//SRVインデックスの開始番号
+	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
 	//SRVインデックスの取得
 	uint32_t GetSrvIndex(const std::string& filePath);
 
