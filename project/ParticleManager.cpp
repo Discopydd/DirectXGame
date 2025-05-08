@@ -62,6 +62,7 @@ void ParticleManager::Update() {
 		ParticleGroups.second.kNumInstance = 0;
 		for (std::list<Particle>::iterator particleIterator = ParticleGroups.second.particles.begin();
 			particleIterator != ParticleGroups.second.particles.end();) {
+			(*particleIterator).currentTime += kDeltaTime;
 			//寿命に達したらグループから外す
 			if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
 				particleIterator = ParticleGroups.second.particles.erase(particleIterator);
@@ -93,7 +94,10 @@ void ParticleManager::Update() {
 				ParticleGroups.second.instancingData[ParticleGroups.second.kNumInstance].World = worldMatrix;
 				ParticleGroups.second.instancingData[ParticleGroups.second.kNumInstance].color = (*particleIterator).color;
 				//Fieldの範囲内のParticleには加速度を適用する
-
+				if (IsCollision(accelerationfield_.area, (*particleIterator).transform.translate)) {
+					(*particleIterator).velocity = Math::Add((*particleIterator).velocity,
+						Math::Multiply(accelerationfield_.acceleration, kDeltaTime));
+				}
 				//速度を適用
 				(*particleIterator).transform.translate.x += (*particleIterator).velocity.x * kDeltaTime;
 				(*particleIterator).transform.translate.y += (*particleIterator).velocity.y * kDeltaTime;
