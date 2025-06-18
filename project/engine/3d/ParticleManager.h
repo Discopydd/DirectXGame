@@ -130,6 +130,6 @@ private:
 	//Δtを定義
 	const float kDeltaTime = 1.0f / 60.0f;
 	//billboardMatrix切り替え
-	bool useBillboard = true;
+	bool useBillboard = false;
 };
 

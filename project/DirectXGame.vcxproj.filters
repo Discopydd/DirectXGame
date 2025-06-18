@@ -99,17 +99,14 @@
     <ClCompile Include="engine\base\SrvManager.cpp">
       <Filter>源文件\base</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="engine\3d\ParticleEmitter.cpp">
+      <Filter>源文件\3d</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleEmitter.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="engine\3d\ParticleManager.cpp">
+      <Filter>源文件\3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ResourceObject.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DebugReporter.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -117,12 +114,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformationMatrix.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexData.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Matrix3x3.h">
@@ -203,11 +194,20 @@
     <ClInclude Include="engine\base\SrvManager.h">
       <Filter>头文件\base</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleManager.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="engine\3d\Particle.h">
+      <Filter>头文件\3d</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleEmitter.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="engine\3d\ParticleEmitter.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\ParticleManager.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\TransformationMatrix.h">
+      <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\VertexData.h">
+      <Filter>头文件\3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

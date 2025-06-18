@@ -10,7 +10,6 @@
 #include "Object3dCommon.h"
 #include "Object3d.h"
 #include "ModelManager.h"
-#include "TransformationMatrix.h"
 #include "MyMath.h"
 #include "ParticleManager.h"
 #include "ParticleEmitter.h"
@@ -68,11 +67,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d->SetModel("plane.obj");
     object3d->SetCamera(camera);
 
-    auto* object3d2nd = new Object3d();
-    object3d2nd->Initialize(object3dCommon);
-    object3d2nd->SetModel("axis.obj");
-    object3d2nd->SetCamera(camera);
-
     // ----------------------------------------
     // スプライト生成
     // ----------------------------------------
@@ -119,9 +113,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ParticleManager::GetInstance()->Update();
         rotation += 0.01f;
         object3d->SetRotate({ 0.0f, rotation.x, 0.0f });
-        object3d2nd->SetRotate({ rotation.x, 0.0f, 0.0f });
         object3d->Update();
-        object3d2nd->Update();
 
 #ifdef USE_IMGUI
         ImGui::Begin("Camera Controller");
@@ -139,26 +131,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         }
 
         ImGui::End();
-        ImGui::Begin("Particle Controller");
-
-        static int count = 1;
-        static float frequency = 0.1f;
-        static float position[3] = { 0.0f, 0.0f, 0.0f };
-
-        ImGui::SliderInt("Count", &count, 1, 100);
-        ImGui::SliderFloat("Frequency", &frequency, 0.01f, 5.0f);
-        ImGui::DragFloat3("Position", position, 0.1f);
-
-        static bool autoEmit = true;
-        ImGui::Checkbox("Auto Emit", &autoEmit);
-        particleEmitter->SetIsAutoEmit(autoEmit);
-
-        // 把 GUI 数值更新到 Emitter
-        particleEmitter->SetCount(count);
-        particleEmitter->SetFrequency(frequency);
-        particleEmitter->SetPosition({ position[0], position[1], position[2] });
-
-        ImGui::End();
 
 #endif
 
@@ -168,14 +140,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         srvManager->PreDraw();
         object3dCommon->CommonDraw();
         object3d->Draw();
-        object3d2nd->Draw();
         spriteCommon->CommonDraw();
 
         for (auto* sprite : sprites) {
             sprite->Draw();
         }
         //パーティクル描画
-        ParticleManager::GetInstance()->Draw();
+      /*  ParticleManager::GetInstance()->Draw();*/
         imguimanager->Draw();
         dxCommon->End();
     }
@@ -200,7 +171,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete srvManager;
     delete object3dCommon;
     delete object3d;
-    delete object3d2nd;
     delete imguimanager;
     delete particleEmitter;
     for (auto* sprite : sprites) {

@@ -50,9 +50,19 @@ void ParticleManager::Update() {
 	Matrix4x4 viewprojectionMatrix = camera_->GetViewprojectionMatrix();
 	//trueなら使う
 	if (useBillboard) {
+		billboardMatrix.m[0][0] = viewMatrix.m[0][0]; // Right
+		billboardMatrix.m[1][0] = viewMatrix.m[0][1];
+		billboardMatrix.m[2][0] = viewMatrix.m[0][2];
+		billboardMatrix.m[0][1] = viewMatrix.m[1][0]; // Up
+		billboardMatrix.m[1][1] = viewMatrix.m[1][1];
+		billboardMatrix.m[2][1] = viewMatrix.m[1][2];
+		billboardMatrix.m[0][2] = viewMatrix.m[2][0]; // Forward
+		billboardMatrix.m[1][2] = viewMatrix.m[2][1];
+		billboardMatrix.m[2][2] = viewMatrix.m[2][2];
 		billboardMatrix.m[3][0] = 0.0f;
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
+		billboardMatrix.m[3][3] = 1.0f;
 	}
 	//falseなら単位行列
 	else if (!useBillboard) {
@@ -88,7 +98,7 @@ void ParticleManager::Update() {
 				Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(scaled);
 
 				Matrix4x4 translateMatrix = Math::MakeTranslateMatrix((*particleIterator).transform.translate);
-				Matrix4x4 worldMatrix = Math::Multiply(scaleMatrix, Math::Multiply(billboardMatrix, translateMatrix));
+				Matrix4x4 worldMatrix = Math::Multiply(Math::Multiply(billboardMatrix, scaleMatrix), translateMatrix);
 				Matrix4x4 worldViewProjectionMatrix = Math::Multiply(worldMatrix, viewprojectionMatrix);
 				ParticleGroups.second.instancingData[ParticleGroups.second.kNumInstance].WVP = worldViewProjectionMatrix;
 				ParticleGroups.second.instancingData[ParticleGroups.second.kNumInstance].World = worldMatrix;

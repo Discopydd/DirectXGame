@@ -31,7 +31,7 @@ void WinApp::Initialize()
 
     // 设置窗口类
     wc.lpfnWndProc = WindowProc;
-    wc.lpszClassName = L"CG2WindowClass";
+    wc.lpszClassName = L"WindowClass";
     wc.hInstance = GetModuleHandle(nullptr);
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
@@ -43,7 +43,7 @@ AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 hwnd = CreateWindow(
     wc.lpszClassName,
-    L"CG2",
+    L"Engine",
     WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT,
     CW_USEDEFAULT,
