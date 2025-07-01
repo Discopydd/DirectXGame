@@ -40,6 +40,12 @@
     <Filter Include="头文件\input">
       <UniqueIdentifier>{8978d373-4c8a-4f98-980b-6310ebf9db03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\audio">
+      <UniqueIdentifier>{a7349f62-8eef-402e-9c77-1ff6e41747b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\audio">
+      <UniqueIdentifier>{a49cf1eb-f93c-47ec-b68b-5336a99ed01e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -104,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="engine\3d\ParticleManager.cpp">
       <Filter>源文件\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>源文件\audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="engine\3d\VertexData.h">
       <Filter>头文件\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\audio\dr_mp3.h">
+      <Filter>头文件\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>头文件\audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

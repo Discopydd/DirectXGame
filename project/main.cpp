@@ -17,6 +17,7 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <SoundManager.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // ----------------------------------------
@@ -47,6 +48,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     ModelManager::GetInstants()->Initialize(dxCommon);
 
+
+    SoundManager::GetInstance()->Initialize();
+    SoundManager::GetInstance()->LoadWav("fanfare", "resources/fanfare.wav");
     // ----------------------------------------
     // カメラ
     // ----------------------------------------
@@ -114,6 +118,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         rotation += 0.01f;
         object3d->SetRotate({ 0.0f, rotation.x, 0.0f });
         object3d->Update();
+
+        if (input->TriggerKey(DIK_SPACE)) {
+            SoundManager::GetInstance()->Play("fanfare", false, 1.0f);
+        }
+
+
 
 #ifdef USE_IMGUI
         ImGui::Begin("Camera Controller");
