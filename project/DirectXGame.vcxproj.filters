@@ -111,7 +111,13 @@
     <ClCompile Include="engine\3d\ParticleManager.cpp">
       <Filter>源文件\3d</Filter>
     </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
+    <ClCompile Include="MyGame.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\audio\SoundManager.cpp">
       <Filter>源文件\audio</Filter>
     </ClCompile>
   </ItemGroup>
@@ -221,7 +227,13 @@
     <ClInclude Include="engine\audio\dr_mp3.h">
       <Filter>头文件\audio</Filter>
     </ClInclude>
-    <ClInclude Include="SoundManager.h">
+    <ClInclude Include="MyGame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\audio\SoundManager.h">
       <Filter>头文件\audio</Filter>
     </ClInclude>
   </ItemGroup>
