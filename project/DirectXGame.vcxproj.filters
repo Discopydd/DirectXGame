@@ -46,6 +46,9 @@
     <Filter Include="源文件\audio">
       <UniqueIdentifier>{a49cf1eb-f93c-47ec-b68b-5336a99ed01e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{4af8b83c-50a5-4864-bc60-872965c8617d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -119,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="engine\audio\SoundManager.cpp">
       <Filter>源文件\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\SceneManager.cpp">
+      <Filter>源文件\base</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\GameScene.cpp">
+      <Filter>scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +244,15 @@
     </ClInclude>
     <ClInclude Include="engine\audio\SoundManager.h">
       <Filter>头文件\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\IScene.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\SceneManager.h">
+      <Filter>头文件\base</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\GameScene.h">
+      <Filter>scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
