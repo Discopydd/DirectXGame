@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Framework.h"
-#include "SceneManager.h"
+#include "scene/GameScene.h"
+#include "TitleScene.h"
+#include "BaseScene.h"
 
 class MyGame : public Framework {
 public:
@@ -11,5 +13,5 @@ public:
     void Finalize() override;
 
 private:
-    SceneManager sceneManager_;
+    BaseScene* scene_ = nullptr;
 };

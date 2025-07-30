@@ -123,11 +123,17 @@
     <ClCompile Include="engine\audio\SoundManager.cpp">
       <Filter>源文件\audio</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\SceneManager.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
       <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,9 +209,6 @@
     <ClInclude Include="engine\2d\Sprite.h">
       <Filter>头文件\2d</Filter>
     </ClInclude>
-    <ClInclude Include="engine\2d\SpriteCommon.h">
-      <Filter>头文件\2d</Filter>
-    </ClInclude>
     <ClInclude Include="engine\3d\Camera.h">
       <Filter>头文件\3d</Filter>
     </ClInclude>
@@ -245,14 +248,20 @@
     <ClInclude Include="engine\audio\SoundManager.h">
       <Filter>头文件\audio</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\IScene.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\SceneManager.h">
-      <Filter>头文件\base</Filter>
-    </ClInclude>
     <ClInclude Include="scene\GameScene.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\2d\SpriteCommon.h">
+      <Filter>头文件\2d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

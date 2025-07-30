@@ -17,7 +17,8 @@
 #include "Camera.h"
 #include <vector>
 #include "BaseScene.h"
-class GameScene : public BaseScene {
+
+class TitleScene : public BaseScene {
 public:
     void Initialize() override;
     void Update() override;
@@ -30,12 +31,7 @@ private:
     Input* input_ = nullptr;
     SpriteCommon* spriteCommon_ = nullptr;
     SrvManager* srvManager_ = nullptr;
-    ImGuiManager* imguiManager_ = nullptr;
-    Object3dCommon* object3dCommon_ = nullptr;
-    Object3d* object3d_ = nullptr;
-    Camera* camera_ = nullptr;
     std::vector<Sprite*> sprites_;
-    ParticleEmitter* particleEmitter_ = nullptr;
-
     Vector2 rotation_{};
+
 };

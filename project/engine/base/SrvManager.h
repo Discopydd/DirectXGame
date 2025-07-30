@@ -32,4 +32,3 @@ private:
 	//SRV用デスクリプターヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
 };
-

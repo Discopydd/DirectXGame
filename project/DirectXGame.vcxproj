@@ -168,6 +168,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="D3DResourceLeakChecker.cpp" />
     <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="engine\2d\SpriteCommon.cpp" />
@@ -182,7 +183,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\audio\SoundManager.cpp" />
     <ClCompile Include="engine\base\DirectXCommon.cpp" />
     <ClCompile Include="engine\base\ImGuiManager.cpp" />
-    <ClCompile Include="engine\base\SceneManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
     <ClCompile Include="engine\base\StringUtility.cpp" />
     <ClCompile Include="engine\base\TextureManager.cpp" />
@@ -193,9 +193,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyGame.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseScene.h" />
     <ClInclude Include="D3DResourceLeakChecker.h" />
     <ClInclude Include="DebugReporter.h" />
     <ClInclude Include="engine\2d\Sprite.h" />
@@ -219,8 +222,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\audio\SoundManager.h" />
     <ClInclude Include="engine\base\DirectXCommon.h" />
     <ClInclude Include="engine\base\ImGuiManager.h" />
-    <ClInclude Include="engine\base\IScene.h" />
-    <ClInclude Include="engine\base\SceneManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
     <ClInclude Include="engine\base\StringUtility.h" />
     <ClInclude Include="engine\base\TextureManager.h" />
@@ -236,7 +237,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MyGame.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

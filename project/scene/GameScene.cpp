@@ -57,12 +57,7 @@ void GameScene::Initialize() {
     particleEmitter_->Initialize("particle");
 }
 
-void GameScene::Update(bool& endRequest) {
-    if (winApp_->ProcessMessage()) {
-        endRequest = true;
-        return;
-    }
-
+void GameScene::Update() {
     camera_->Update();
     imguiManager_->Begin();
     input_->Update();

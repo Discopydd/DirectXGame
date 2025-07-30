@@ -1,18 +1,19 @@
 #include "MyGame.h"
-#include "scene/GameScene.h"
-
 void MyGame::Initialize() {
-    sceneManager_.ChangeScene(std::make_unique<GameScene>());
+    Framework::Initialize();
+    BaseScene* scene = new TitleScene();
+    sceneManager_->SetNextScene(scene);
 }
 
 void MyGame::Update() {
-    sceneManager_.Update(endRequest_);
+    Framework::Update();
+    sceneManager_->Update();
 }
 
 void MyGame::Draw() {
-    sceneManager_.Draw();
+    sceneManager_->Draw();
 }
 
 void MyGame::Finalize() {
-    sceneManager_.Finalize();
+    Framework::Finalize();
 }
