@@ -1,20 +1,14 @@
 #include "GameScene.h"
 
 void GameScene::Initialize() {
-    winApp_ = new WinApp();
-    winApp_->Initialize();
-
-    dxCommon_ = new DirectXCommon();
-    dxCommon_->Initialize(winApp_);
-
-    input_ = new Input();
-    input_->Initialize(winApp_);
+    winApp_ = WinApp::GetInstance();
+    dxCommon_ = DirectXCommon::GetInstance();
+    input_ = Input::GetInstance();
+    srvManager_ = SrvManager::GetInstance();
 
     spriteCommon_ = new SpriteCommon();
     spriteCommon_->Initialize(dxCommon_);
 
-    srvManager_ = new SrvManager();
-    srvManager_->Initialize(dxCommon_);
 
     TextureManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 
@@ -25,8 +19,9 @@ void GameScene::Initialize() {
     object3dCommon_->Initialize(dxCommon_);
 
     ModelManager::GetInstants()->Initialize(dxCommon_);
-    SoundManager::GetInstance()->Initialize();
-    SoundManager::GetInstance()->LoadWav("fanfare", "resources/fanfare.wav");
+    SoundManager* soundMgr = SoundManager::GetInstance();
+    soundMgr->Initialize();
+    soundMgr->LoadWav("fanfare", "resources/fanfare.wav");
 
     camera_ = new Camera();
     camera_->SetRotate({ 0, 0, 0 });
@@ -111,19 +106,13 @@ void GameScene::Draw() {
 }
 
 void GameScene::Finalize() {
-    dxCommon_->Finalize();
-    winApp_->Finalize();
     ParticleManager::GetInstance()->Finalize();
     TextureManager::GetInstance()->Finalize();
     ModelManager::GetInstants()->Finalize();
     imguiManager_->Finalize();
 
     delete camera_;
-    delete input_;
-    delete winApp_;
-    delete dxCommon_;
     delete spriteCommon_;
-    delete srvManager_;
     delete object3dCommon_;
     delete object3d_;
     delete imguiManager_;

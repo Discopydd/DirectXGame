@@ -11,7 +11,10 @@ public:
 public: 
 	void Initialize(WinApp* winApp);
 
+	Input(const Input&) = delete;
+    Input& operator=(const Input&) = delete;
 
+    static Input* GetInstance();
 	void Update();
 
 	bool PushKey(BYTE keyNumber);
@@ -23,4 +26,6 @@ private:
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
 	WinApp* winApp_ = nullptr;
+	 Input() = default;
+    ~Input() = default;
 };

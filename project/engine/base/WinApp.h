@@ -8,8 +8,13 @@ class WinApp {
 private:
     HWND hwnd = nullptr;
     WNDCLASS wc{};
+    WinApp() = default; // 禁止外部构造
+    ~WinApp() = default;
 
 public:
+    WinApp(const WinApp&) = delete;
+    WinApp& operator=(const WinApp&) = delete;
+    static WinApp* GetInstance();
     static constexpr int32_t kClientWidth = 1280;
     static constexpr int32_t kClientHeight = 720;
 

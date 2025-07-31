@@ -3,7 +3,7 @@
 #include <format>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-#include "Logger.h"
+#include "logger/Logger.h"
 #include "../base/StringUtility.h"
 
 
@@ -13,6 +13,10 @@ using namespace StringUtility;
 
 const uint32_t DirectXCommon::kMaxSRVCount = 512;
 
+DirectXCommon* DirectXCommon::GetInstance() {
+    static DirectXCommon instance;
+    return &instance;
+}
 void DirectXCommon::DeviceInitialize()
 {
 #ifdef _DEBUG

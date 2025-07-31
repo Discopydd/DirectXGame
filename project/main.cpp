@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include "MyGame.h"
-#include <Framework.h>
+#include <scene/Framework.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     Framework* game = new MyGame();

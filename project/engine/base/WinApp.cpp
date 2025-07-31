@@ -82,3 +82,7 @@ bool WinApp::ProcessMessage()
     }
     return false;
 }
+WinApp* WinApp::GetInstance() {
+    static WinApp instance;
+    return &instance;
+}

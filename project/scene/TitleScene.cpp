@@ -2,20 +2,14 @@
 #include "SceneManager.h"
 #include "scene/GameScene.h"
 void TitleScene::Initialize() {
-    winApp_ = new WinApp();
-    winApp_->Initialize();
+    winApp_ = WinApp::GetInstance();
+    dxCommon_ = DirectXCommon::GetInstance();
+    input_ = Input::GetInstance();
+    srvManager_ = SrvManager::GetInstance();
 
-    dxCommon_ = new DirectXCommon();
-    dxCommon_->Initialize(winApp_);
-
-    input_ = new Input();
-    input_->Initialize(winApp_);
 
     spriteCommon_ = new SpriteCommon();
     spriteCommon_->Initialize(dxCommon_);
-
-    srvManager_ = new SrvManager();
-    srvManager_->Initialize(dxCommon_);
 
     TextureManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 
@@ -55,15 +49,9 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::Finalize() {
-    dxCommon_->Finalize();
-    winApp_->Finalize();
     TextureManager::GetInstance()->Finalize();
 
-    delete input_;
-    delete winApp_;
-    delete dxCommon_;
     delete spriteCommon_;
-    delete srvManager_;
 
     for (auto* sprite : sprites_) {
         delete sprite;

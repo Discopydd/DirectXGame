@@ -48,7 +48,10 @@ public:
     void RenderImGui();
 	void FinalizeImGui();
 
+	DirectXCommon(const DirectXCommon&) = delete;
+    DirectXCommon& operator=(const DirectXCommon&) = delete;
 
+    static DirectXCommon* GetInstance();
 	//SRVの指定番号のCPUデスクリプタハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
 
@@ -108,7 +111,8 @@ private: // メンバ変数
 	WinApp* winApp_ = nullptr;
 	HRESULT hr;
 
-
+	 DirectXCommon() = default;
+    ~DirectXCommon() = default;
 	// Direct3D関連
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 	Microsoft::WRL::ComPtr<ID3D12Device> device;

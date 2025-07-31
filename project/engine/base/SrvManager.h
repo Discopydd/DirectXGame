@@ -23,6 +23,11 @@ public://初期化
 	static const uint32_t kMaxSRVCount;
 	//デスクリプタハンドル取得
  	ID3D12DescriptorHeap* GetDescriptorHeap() { return descriptorHeap.Get(); }
+
+	  SrvManager(const SrvManager&) = delete;
+    SrvManager& operator=(const SrvManager&) = delete;
+
+    static SrvManager* GetInstance();
 private:
 	DirectXCommon* directXCommon = nullptr;
 	//SRV用DescriptorSizeを取得
@@ -31,4 +36,7 @@ private:
 	uint32_t useIndex = 0;
 	//SRV用デスクリプターヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>descriptorHeap;
+
+	SrvManager() = default;
+    ~SrvManager() = default;
 };

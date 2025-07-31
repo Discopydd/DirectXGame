@@ -1,267 +1,253 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\math">
-      <UniqueIdentifier>{e9027eb4-f4d1-4419-9c40-311006287ad1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\2d">
-      <UniqueIdentifier>{04592185-3914-414b-aa65-cb12d049ee27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\3d">
-      <UniqueIdentifier>{59bfb5c4-1d75-46cb-b3e2-5cfa8b9e00c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\base">
-      <UniqueIdentifier>{c37f45ec-d4d0-430c-bd66-2fade8cc5aff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\2d">
-      <UniqueIdentifier>{7fa0a124-9cb2-46f5-b9eb-947bd7589bf8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\3d">
-      <UniqueIdentifier>{a2c2e71e-addb-4c5e-8dbb-6532b0dabe46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\base">
-      <UniqueIdentifier>{5628cf8d-4b7a-4acf-bea3-f106a2acc158}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\input">
-      <UniqueIdentifier>{177387ec-9735-4ca5-8bcf-4037b353134b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\input">
-      <UniqueIdentifier>{8978d373-4c8a-4f98-980b-6310ebf9db03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\audio">
-      <UniqueIdentifier>{a7349f62-8eef-402e-9c77-1ff6e41747b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\audio">
-      <UniqueIdentifier>{a49cf1eb-f93c-47ec-b68b-5336a99ed01e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="scene">
       <UniqueIdentifier>{4af8b83c-50a5-4864-bc60-872965c8617d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{3f9a2370-400c-4326-aa13-603fc1422d12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logger">
+      <UniqueIdentifier>{45218e31-67d9-478c-b7f0-07f98cd25f61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project">
+      <UniqueIdentifier>{98de88ff-3ea5-4725-bad3-27846324ca7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project\2d">
+      <UniqueIdentifier>{04592185-3914-414b-aa65-cb12d049ee27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project\3d">
+      <UniqueIdentifier>{59bfb5c4-1d75-46cb-b3e2-5cfa8b9e00c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project\audio">
+      <UniqueIdentifier>{a7349f62-8eef-402e-9c77-1ff6e41747b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project\base">
+      <UniqueIdentifier>{c37f45ec-d4d0-430c-bd66-2fade8cc5aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="project\math">
+      <UniqueIdentifier>{e9027eb4-f4d1-4419-9c40-311006287ad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{35e34dec-a18f-4d09-b79a-d7bf0e1a1187}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Logger.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DResourceLeakChecker.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="engine\math\MyMath.cpp">
-      <Filter>头文件\math</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\input\Input.cpp">
-      <Filter>源文件\input</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\2d\Sprite.cpp">
-      <Filter>源文件\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\2d\SpriteCommon.cpp">
-      <Filter>源文件\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\Model.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\ModelCommon.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\ModelManager.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\Object3d.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\Object3dCommon.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\DirectXCommon.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\StringUtility.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\TextureManager.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\WinApp.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\Camera.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\ImGuiManager.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\SrvManager.cpp">
-      <Filter>源文件\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\ParticleEmitter.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\3d\ParticleManager.cpp">
-      <Filter>源文件\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="MyGame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Framework.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\audio\SoundManager.cpp">
-      <Filter>源文件\audio</Filter>
+      <Filter>project\math</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
+    <ClCompile Include="scene\TitleScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>scene</Filter>
+    <ClCompile Include="engine\input\Input.cpp">
+      <Filter>input</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="logger\Logger.cpp">
+      <Filter>logger</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\2d\Sprite.cpp">
+      <Filter>project\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\2d\SpriteCommon.cpp">
+      <Filter>project\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Camera.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Model.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ModelCommon.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ModelManager.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Object3d.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\Object3dCommon.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ParticleEmitter.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\3d\ParticleManager.cpp">
+      <Filter>project\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\audio\SoundManager.cpp">
+      <Filter>project\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\BaseScene.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\DirectXCommon.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\ImGuiManager.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\SceneManager.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\SrvManager.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\StringUtility.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\TextureManager.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\WinApp.cpp">
+      <Filter>project\base</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DResourceLeakChecker.cpp">
+      <Filter>project</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="MyGame.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Framework.cpp">
+      <Filter>main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DebugReporter.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Logger.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DResourceLeakChecker.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="engine\math\Matrix3x3.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Matrix4x4.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\MyMath.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Transform.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Vector2.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Vector3.h">
-      <Filter>头文件\math</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\Vector4.h">
-      <Filter>头文件\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\input\Input.h">
-      <Filter>头文件\input</Filter>
+      <Filter>project\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\DirectXCommon.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\StringUtility.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\TextureManager.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\WinApp.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Material.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\MaterialData.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Model.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ModelCommon.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ModelData.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ModelManager.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Object3d.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Object3dCommon.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\2d\Sprite.h">
-      <Filter>头文件\2d</Filter>
+      <Filter>project\2d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Camera.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\DirectionalLight.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\ImGuiManager.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\SrvManager.h">
-      <Filter>头文件\base</Filter>
+      <Filter>project\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\Particle.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ParticleEmitter.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\ParticleManager.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\TransformationMatrix.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\3d\VertexData.h">
-      <Filter>头文件\3d</Filter>
+      <Filter>project\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\audio\dr_mp3.h">
-      <Filter>头文件\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="MyGame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Framework.h">
-      <Filter>头文件</Filter>
+      <Filter>project\audio</Filter>
     </ClInclude>
     <ClInclude Include="engine\audio\SoundManager.h">
-      <Filter>头文件\audio</Filter>
+      <Filter>project\audio</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameScene.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="TitleScene.h">
-      <Filter>scene</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="engine\2d\SpriteCommon.h">
-      <Filter>头文件\2d</Filter>
+      <Filter>project\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\TitleScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\SceneManager.h">
+      <Filter>project\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\Input.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="logger\Logger.h">
+      <Filter>logger</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\BaseScene.h">
+      <Filter>project\base</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DResourceLeakChecker.h">
+      <Filter>project</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugReporter.h">
+      <Filter>project</Filter>
+    </ClInclude>
+    <ClInclude Include="MyGame.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Framework.h">
+      <Filter>main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

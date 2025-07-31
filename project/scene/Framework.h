@@ -1,5 +1,9 @@
 #pragma once
 #include "SceneManager.h"
+#include <WinApp.h>
+#include <DirectXCommon.h>
+#include <Input.h>
+#include <SrvManager.h>
 class Framework {
 public:
     virtual ~Framework() = default;
