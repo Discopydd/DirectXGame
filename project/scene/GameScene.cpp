@@ -34,9 +34,13 @@ void GameScene::Initialize() {
     ModelManager::GetInstants()->LoadModel("terrain.obj");
     object3d_ = new Object3d();
     object3d_->Initialize(object3dCommon_);
-    object3d_->SetModel("terrain.obj");
+    object3d_->SetModel("plane.obj");
     object3d_->SetCamera(camera_);
-
+    terrain_ = new Object3d();
+    terrain_->Initialize(object3dCommon_);
+    terrain_->SetModel("terrain.obj");
+    terrain_->SetCamera(camera_);
+    terrain_->SetTranslate({ 0.0f, -1.0f,5.0f });
     std::string textureFilePath[] = { "Resources/monsterBall.png", "Resources/uvChecker.png" };
     for (uint32_t i = 0; i < 1; ++i) {
         Sprite* sprite = new Sprite();
@@ -68,7 +72,7 @@ void GameScene::Update() {
 
     object3d_->SetRotate({ 0.0f, rotation_.x, 0.0f });
     object3d_->Update();
-
+    terrain_->Update();
     if (input_->TriggerKey(DIK_SPACE)) {
         SoundManager::GetInstance()->Play("fanfare", false, 1.0f);
     }
@@ -173,6 +177,7 @@ void GameScene::Draw() {
     srvManager_->PreDraw();
     object3dCommon_->CommonDraw();
     object3d_->Draw();
+    terrain_->Draw();
     spriteCommon_->CommonDraw();
     for (auto* sprite : sprites_) {
         sprite->Draw();
@@ -192,6 +197,7 @@ void GameScene::Finalize() {
     delete spriteCommon_;
     delete object3dCommon_;
     delete object3d_;
+    delete terrain_;
     delete imguiManager_;
     delete particleEmitter_;
 
