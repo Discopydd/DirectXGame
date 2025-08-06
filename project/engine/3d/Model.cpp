@@ -34,7 +34,7 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directorypat
 	materialData->color = { Vector4(1.0f, 1.0f, 1.0f, 1.0f) };
 	materialData->enableLighting = false;//有効にするか否か
 	materialData->uvTransform = Math::MakeIdentity4x4();
-
+	materialData->shininess = 70;
 	//.objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(modelData.material.textureFilePath);
 	//読み込んだテクスチャ番号を取得

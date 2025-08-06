@@ -1,7 +1,6 @@
 #pragma once
 #include "Vector3.h"
 #include "Vector4.h"
-
 struct SpotLight {
     Vector4 color;
     Vector3 position;

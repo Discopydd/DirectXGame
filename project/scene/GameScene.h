@@ -33,6 +33,7 @@ private:
     ImGuiManager* imguiManager_ = nullptr;
     Object3dCommon* object3dCommon_ = nullptr;
     Object3d* object3d_ = nullptr;
+    Object3d* terrain_ = nullptr;
     Camera* camera_ = nullptr;
     std::vector<Sprite*> sprites_;
     ParticleEmitter* particleEmitter_ = nullptr;

@@ -249,6 +249,15 @@
     <ClInclude Include="scene\Framework.h">
       <Filter>main</Filter>
     </ClInclude>
+    <ClInclude Include="engine\3d\CameraForGPU.h">
+      <Filter>project\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\SpotLight.h">
+      <Filter>project\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\3d\PointLight.h">
+      <Filter>project\3d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\externals\imgui\LICENSE.txt" />

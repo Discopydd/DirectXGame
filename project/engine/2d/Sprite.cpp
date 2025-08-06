@@ -3,6 +3,7 @@
 #include "../math/MyMath.h"
 #include "../math/Transform.h"
 #include "../base/TextureManager.h"
+#include <numbers>
 
 //初期化
 void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath) {
@@ -12,6 +13,10 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 	VertexDataCreate();
 	IndexCreate();
 	MaterialCreate();
+	CameraCreate();
+	DirectionalLightCreate();
+	PointLightCreate();
+	SpotLightCreate();
 	TransformationCreate();
 	AdjustTextureSize();
 }
@@ -83,6 +88,10 @@ void Sprite::Draw() {
 	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
 	//SRVのDescriptorTableの先頭を設定
 	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(filePath));
+	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	spriteCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//DrawCall(描画)
 	spriteCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
@@ -126,6 +135,7 @@ void Sprite::MaterialCreate() {
 	materialData->enableLighting = false;
 	//UVTransform行列を単位行列で初期化
 	materialData->uvTransform = Math::MakeIdentity4x4();
+	materialData->shininess = 70;
 }
 //座標変換行列データ作成
 void Sprite::TransformationCreate() {
@@ -136,6 +146,42 @@ void Sprite::TransformationCreate() {
 	// 単位行列を書き込んでおく
 	transformationMatrixData->WVP = Math::MakeIdentity4x4();
 	transformationMatrixData->World = Math::MakeIdentity4x4();
+}
+void Sprite::CameraCreate()
+{
+	//リソースを作る
+	cameraResource = spriteCommon->GetDxCommon()->CreateBufferResource(sizeof(CameraForGPU));
+	//書き込むためのアドレスの取得
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+	cameraData->worldPosition = { 0.0f, 0.0f, -5.0f };
+
+}
+void Sprite::DirectionalLightCreate()
+{   directionalLightResource = spriteCommon->GetDxCommon()->CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	directionalLightData->color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLightData->direction = Math::Normalize(directionalLightData->direction);
+	directionalLightData->intensity = 1.0f;
+}
+void Sprite::PointLightCreate()
+{
+	pointLightResource = spriteCommon->GetDxCommon()->CreateBufferResource(sizeof(PointLight));
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+	pointLightData->position = { 0.0f, 1.0f, -1.0f }; // 点光源的位置
+	pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 点光源的颜色
+	pointLightData->intensity = 1.0f;
+}
+void Sprite::SpotLightCreate()
+{
+	spotLightResource = spriteCommon->GetDxCommon()->CreateBufferResource(sizeof(SpotLight));
+	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+	spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	spotLightData->position = { 0.0f, 2.0f, 5.0f };
+	spotLightData->distance = 7.0f;
+	spotLightData->direction = Math::Normalize({ 0.0f, 0.0f, 1.0f });
+	spotLightData->intensity = 4.0f;
+	spotLightData->decay = 2.0f;
+	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 }
 void Sprite::AdjustTextureSize()
 {

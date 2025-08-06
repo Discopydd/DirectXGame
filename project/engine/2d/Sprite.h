@@ -9,6 +9,10 @@
 #include"VertexData.h"
 #include"TransformationMatrix.h"
 #include "SrvManager.h"
+#include <CameraForGPU.h>
+#include <DirectionalLight.h>
+#include <PointLight.h>
+#include <SpotLight.h>
 
 
 class SpriteCommon;
@@ -71,16 +75,33 @@ private:
 	void MaterialCreate();
 	//座標変換行列データ作成
 	void TransformationCreate();
+
+	void CameraCreate();
+	void DirectionalLightCreate();
+	void PointLightCreate();
+	void SpotLightCreate();
 	//バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource;
 	//バッファリソース内のデータを指すポインタ
 	VertexData* vertexData = nullptr;
 	uint32_t* indexData = nullptr;
 	Material* materialData = nullptr;
 	TransformationMatrix* transformationMatrixData = nullptr;
+	
+	CameraForGPU* cameraData = nullptr;
+	// 平行光源用のResourceを作成
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
+	DirectionalLight* directionalLightData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
+	PointLight* pointLightData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
+	SpotLight* spotLightData = nullptr;
 	//バッファリソースの使い道を補足するバッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;

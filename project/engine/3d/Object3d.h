@@ -37,6 +37,10 @@ public:
 	void SetTranslate(const Vector3& translate) { transform.translate = translate; }
 	//setter
 	void SetCamera(Camera* camera) { this->camera = camera; };
+    DirectionalLight* GetDirectionalLightData() const { return directionalLightData; }
+	Model* GetModel() const { return model_; }
+	PointLight* GetPointLightData() const { return pointLightData; }
+    SpotLight* GetSpotLightData() const { return spotLightData; }
 private:
 
 	Object3dCommon* object3dCommon_ = nullptr;
@@ -52,6 +56,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
 	DirectionalLight* directionalLightData = nullptr;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource;
+	CameraForGPU* cameraData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
+	PointLight* pointLightData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
+	SpotLight* spotLightData = nullptr;
 	// SRT
 	Transform transform;
     Matrix4x4 worldMatrix;
