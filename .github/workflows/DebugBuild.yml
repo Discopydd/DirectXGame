@@ -3,6 +3,7 @@ on:
    push:
      branches:
         - master
+   workflow_dispatch:
 env:
      SOLUTION_FILE_PATH: DirectXGame.sln # ソリューションファイルのパス（例）
      CONFIGURATION: Debug # ビルド構成（Debug / Release）
