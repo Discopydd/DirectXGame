@@ -3,8 +3,9 @@ name: ReleaseBuild # ワークフローの名前
 on: # トリガー設定
   push: # push イベントで実行
     branches:
-      - master # master ブランチへの push を監視
-
+      - master
+  workflow_dispatch:
+ 
 env: # 環境変数
   SOLUTION_FILE_PATH: DirectXGame.sln # ソリューションファイルのパス（例）
   CONFIGURATION: Release # ビルド構成（Release）
